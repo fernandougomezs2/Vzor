@@ -1,0 +1,21 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "vzor"
+version = "0.3.2"
+description = "Rust-powered data quality library for Python"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+dependencies = ["pandas>=2.0"]
+
+[project.scripts]
+vzor = "vzor.cli:main"
+
+[tool.maturin]
+bindings = "pyo3"
+manifest-path = "crates/vzor-core/Cargo.toml"
+python-source = "python"
+module-name = "vzor._vzor_core"

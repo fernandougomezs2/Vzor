@@ -1,0 +1,3 @@
+[workspace]
+members = ["crates/vzor-core"]
+resolver = "2"

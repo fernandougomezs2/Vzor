@@ -1,0 +1,41 @@
+# Changelog
+
+## 0.3.2
+
+### Changed
+
+- High-level report representations are compact structural summaries with
+  five-item previews. Full report data, detailed individual model `repr`,
+  `human_summary`, and deterministic HTML exports are unchanged.
+
+## 0.3.1
+
+### Added
+
+- Complete, deterministic standalone HTML export through `report.to_html(path)`
+  for all four public report types.
+
+### Changed
+
+- Plain-text representations show at most five items per collection while the
+  underlying reports and HTML output retain every item.
+
+## 0.3.0
+
+### Added
+
+- Python reporting API and deterministic human-readable summaries.
+- Convenience properties for reports and existing exact column lookup.
+- `AGENTS.md`, user documentation, and a self-contained workflow example.
+- A formal MIT license.
+
+### Changed
+
+- CLI help and operational error messages are clearer without changing JSON or
+  exit-code contracts.
+- Package metadata now includes the README and license file.
+
+### Fixed
+
+- Package version metadata is exposed as `vzor.__version__`.
+- The Rust version function now derives its value from the Cargo manifest.

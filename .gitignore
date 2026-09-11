@@ -1,0 +1,123 @@
+# =========================
+# Python
+# =========================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Mypy / Ruff / type checkers
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+*.whl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# =========================
+# Rust
+# =========================
+
+target/
+
+# =========================
+# Maturin / PyO3
+# =========================
+
+*.pyd
+*.pdb
+*.so
+*.dylib
+
+# =========================
+# IDE / Editors
+# =========================
+
+.vscode/
+.idea/
+
+# =========================
+# OS files
+# =========================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Temporary files
+# =========================
+
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+~$*
+
+# =========================
+# Benchmark outputs
+# =========================
+
+benchmarks/results/
+benchmarks/datasets/
+benchmark_results/
+stress_data/
+
+# Large benchmark datasets
+*.parquet
+*.feather
+*.arrow
+
+# =========================
+# Local generated reports
+# =========================
+
+*.html
+
+# =========================
+# Local test datasets
+# =========================
+
+dataset_ventas_vzor_1000.csv
+
+# =========================
+# Secrets / local config
+# =========================
+
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.pfx
+*.p12
+
+# =========================
+# Misc caches
+# =========================
+
+.cache/
