@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Local-only, reproducible benchmark and memory-inventory infrastructure for
+  the v0.4.1 measurement subphase. It is outside Vzor's runtime and does not
+  change package or output-format versions.
+
 ## 0.3.2
 
 ### Changed

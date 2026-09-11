@@ -12,7 +12,7 @@ de pandas ni un motor general de ingesta.
 v0.1 — Core                                      COMPLETE
 v0.2 — Validación, drift y uso operativo         COMPLETE
 v0.3 — Madurez, reporting y UX avanzada          COMPLETE
-v0.4 — Hardening, performance y backends         PLANNED
+v0.4 — Hardening, performance y backends         IN DEVELOPMENT
 v0.5 — Excel / Power BI exports                   PLANNED
 ```
 
@@ -170,6 +170,17 @@ No convertir reportes o recomendaciones en la fuente de verdad: los resultados
 estructurados siguen siendo el contrato.
 
 # v0.4 — Hardening, performance, escalabilidad y backends
+
+## v0.4.1 — Benchmark Baseline & Memory Inventory — IN DEVELOPMENT
+
+La subfase crea infraestructura local y reproducible para medir runtime,
+throughput, tiempos de carga y peak working set/RSS contextualizado por
+hardware. Los perfiles incluyen baseline, numeric, many_nulls,
+high_cardinality, heavy_strings, categorical y wide; los objetivos de 5M filas
+son stress-test targets bajo evaluación, no una afirmación de soporte general.
+
+No cambia runtime, bindings, API, contratos, persistencia, CLI, HTML, `repr`,
+ni las versiones `0.3.2`, `output_version = 1` y `format_version = 1`.
 
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.

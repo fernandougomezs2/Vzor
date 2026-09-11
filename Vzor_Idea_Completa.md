@@ -4,7 +4,10 @@
 > backends; no pretende reemplazarlos ni convertirse en un motor general de
 > ingesta.
 
-Estado actual: **Vzor v0.3.2 — Compact Report Repr — COMPLETE**. Los reportes
+Estado actual: **Vzor v0.3.2 — Compact Report Repr — COMPLETE**. La subfase
+v0.4.1 está en desarrollo exclusivamente para benchmarks locales y un
+inventario de memoria; no modifica el runtime ni implica soporte general para
+datasets de 5M filas. Los reportes
 mantienen todos sus datos y HTML completo, mientras que su `repr` de alto nivel
 presenta summaries y previews estructurales acotados. El paquete es `0.3.2`.
 
