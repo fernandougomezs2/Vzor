@@ -191,6 +191,16 @@ factuales, semánticas ni formatos. El conteo exacto de únicos, strings,
 normalización Python, buffers, GIL, Arrow, Polars y compare/drift quedan fuera
 de alcance para subfases posteriores.
 
+## v0.4.2-B — Reducción de materialización Python/Rust — COMPLETE
+
+Esta subfase elimina la lista Python normalizada completa y el
+`Vec<Py<PyAny>>` redundante en la frontera privada pandas/PyO3. Las series de
+enteros signed sin nulos, float y Boolean sin nulos se consumen directamente;
+los dtypes que requieren normalización conservan un generador para preservar
+nulls, overflow, errores y transporte datetime existentes. Rust conserva su
+`Vec<ProfileValue>` propio. No hay API nueva, cambios semánticos, dependencias,
+Arrow, Polars, unsafe, paralelismo ni cambio de versión.
+
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.
 

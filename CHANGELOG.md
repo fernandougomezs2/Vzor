@@ -4,6 +4,9 @@
 
 ### Changed
 
+- v0.4.2-B removes the private whole-column normalized Python list and PyO3
+  `Vec<Py<PyAny>>` materialization between pandas and Rust. It preserves the
+  existing dtype, null, overflow, error, API, and output contracts.
 - v0.4.2-A makes Rust profiling borrow `DatasetInput` for the observed,
   suggested, and inspection pipelines, eliminating their redundant deep input
   clones without changing public behavior.

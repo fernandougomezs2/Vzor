@@ -9,10 +9,11 @@ from pandas.api.types import (
     is_float_dtype,
     is_integer_dtype,
     is_object_dtype,
+    is_signed_integer_dtype,
     is_string_dtype,
 )
 
-NormalizedColumn = tuple[str, str, list[object]]
+NormalizedColumn = tuple[str, str, object, bool]
 
 
 def _normalize_dataframe(df: pd.DataFrame) -> list[NormalizedColumn]:
@@ -27,10 +28,38 @@ def _normalize_dataframe(df: pd.DataFrame) -> list[NormalizedColumn]:
     for name in df.columns:
         series = df[name]
         logical_type = _infer_logical_type(series)
-        values = [_normalize_value(value, logical_type, name) for value in series]
-        columns.append((name, logical_type, values))
+        values, raw_scalars = _normalized_values(series, logical_type, name)
+        columns.append((name, logical_type, values, raw_scalars))
 
     return columns
+
+
+def _normalized_values(
+    series: pd.Series, logical_type: str, column_name: str
+) -> tuple[object, bool]:
+    """Yield normalized values without materializing a full Python list.
+
+    Signed integer, float, and non-nullable Boolean Series can be iterated as
+    their native scalar values. Rust applies their existing conversion while
+    constructing its owned input. Other dtypes retain the normalizing generator
+    so their null and error semantics are unchanged.
+    """
+
+    if (
+        logical_type == "integer"
+        and is_signed_integer_dtype(series.dtype)
+        and not series.hasnans
+    ):
+        return series, True
+    if logical_type == "float":
+        return series, True
+    if logical_type == "boolean" and not series.hasnans:
+        return series, True
+
+    return (
+        (_normalize_value(value, logical_type, column_name) for value in series),
+        False,
+    )
 
 
 def _infer_logical_type(series: pd.Series) -> str:

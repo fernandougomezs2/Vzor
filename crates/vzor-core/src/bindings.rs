@@ -1,7 +1,7 @@
 use pyo3::{
     exceptions::{PyOSError, PyTypeError, PyValueError},
     prelude::*,
-    types::{PyBool, PyDict, PyFloat, PyInt, PyList, PyString},
+    types::{PyBool, PyDict, PyFloat, PyInt, PyIterator, PyList, PyString},
 };
 
 use crate::comparison::{
@@ -27,7 +27,8 @@ use crate::validation::{
     ValidationValue,
 };
 
-type NormalizedColumn = (String, String, Vec<Py<PyAny>>);
+type NormalizedColumn = (String, String, Py<PyAny>, bool);
+type PythonColumn = Py<PyAny>;
 type SuggestedSchemaColumn = (
     String,
     String,
@@ -50,14 +51,14 @@ pub(crate) fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 #[pyfunction]
-fn profile_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
+fn profile_dataset(py: Python<'_>, columns: Vec<PythonColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
     let profile = profile_structure(&input).map_err(profiling_error)?;
     dataset_profile_to_python(py, profile)
 }
 
 #[pyfunction]
-fn observed_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
+fn observed_schema_dataset(py: Python<'_>, columns: Vec<PythonColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
     let profile = profile_structure(&input).map_err(profiling_error)?;
     let schema = observed_schema_from_profile_and_input(&profile, &input)
@@ -67,7 +68,7 @@ fn observed_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> Py
 }
 
 #[pyfunction]
-fn suggest_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
+fn suggest_schema_dataset(py: Python<'_>, columns: Vec<PythonColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
     let profile = profile_structure(&input).map_err(profiling_error)?;
     let observed = observed_schema_from_profile_and_input(&profile, &input)
@@ -78,7 +79,7 @@ fn suggest_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyR
 }
 
 #[pyfunction]
-fn inspect_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
+fn inspect_dataset(py: Python<'_>, columns: Vec<PythonColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
     let profile = profile_structure(&input).map_err(profiling_error)?;
     let observed = observed_schema_from_profile_and_input(&profile, &input)
@@ -102,7 +103,7 @@ fn inspect_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<P
 #[pyfunction]
 fn save_suggested_schema_dataset(
     py: Python<'_>,
-    columns: Vec<NormalizedColumn>,
+    columns: Vec<PythonColumn>,
     path: String,
 ) -> PyResult<()> {
     let input = dataset_input_from_python(py, columns)?;
@@ -115,7 +116,7 @@ fn save_suggested_schema_dataset(
 #[pyfunction]
 fn validate_dataset_file(
     py: Python<'_>,
-    columns: Vec<NormalizedColumn>,
+    columns: Vec<PythonColumn>,
     schema_path: String,
 ) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
@@ -128,7 +129,7 @@ fn validate_dataset_file(
 #[pyfunction(name = "_validate_dataset_schema")]
 fn validate_dataset_schema(
     py: Python<'_>,
-    columns: Vec<NormalizedColumn>,
+    columns: Vec<PythonColumn>,
     schema_columns: Vec<SuggestedSchemaColumn>,
 ) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
@@ -141,8 +142,8 @@ fn validate_dataset_schema(
 #[pyfunction]
 fn compare_datasets(
     py: Python<'_>,
-    before_columns: Vec<NormalizedColumn>,
-    after_columns: Vec<NormalizedColumn>,
+    before_columns: Vec<PythonColumn>,
+    after_columns: Vec<PythonColumn>,
 ) -> PyResult<Py<PyAny>> {
     let before_input = dataset_input_from_python(py, before_columns)?;
     let after_input = dataset_input_from_python(py, after_columns)?;
@@ -156,8 +157,8 @@ fn compare_datasets(
 #[pyfunction]
 fn schema_drift_datasets(
     py: Python<'_>,
-    before_columns: Vec<NormalizedColumn>,
-    after_columns: Vec<NormalizedColumn>,
+    before_columns: Vec<PythonColumn>,
+    after_columns: Vec<PythonColumn>,
 ) -> PyResult<Py<PyAny>> {
     let before_input = dataset_input_from_python(py, before_columns)?;
     let after_input = dataset_input_from_python(py, after_columns)?;
@@ -207,17 +208,23 @@ fn suggested_schema_from_python(
     Ok(SuggestedDatasetSchema::new(columns))
 }
 
-fn dataset_input_from_python(
-    py: Python<'_>,
-    columns: Vec<NormalizedColumn>,
-) -> PyResult<DatasetInput> {
+fn dataset_input_from_python(py: Python<'_>, columns: Vec<PythonColumn>) -> PyResult<DatasetInput> {
     let columns = columns
         .into_iter()
-        .map(|(name, logical_type, values)| {
+        .map(|column| {
+            let (name, logical_type, values, raw_scalars) =
+                normalized_column_from_python(py, column)?;
             let logical_type = parse_logical_type(&logical_type)?;
-            let values = values
-                .iter()
-                .map(|value| profile_value_from_python(py, value))
+            let values = PyIterator::from_object(&values.bind(py))?
+                .map(|value| {
+                    value.and_then(|value| {
+                        if raw_scalars {
+                            profile_value_from_raw_scalar(&value, &logical_type, &name)
+                        } else {
+                            profile_value_from_bound(&value)
+                        }
+                    })
+                })
                 .collect::<PyResult<Vec<_>>>()?;
 
             Ok(ColumnInput::new(name, logical_type, values))
@@ -225,6 +232,19 @@ fn dataset_input_from_python(
         .collect::<PyResult<Vec<_>>>()?;
 
     Ok(DatasetInput::new(columns))
+}
+
+fn normalized_column_from_python(
+    py: Python<'_>,
+    column: PythonColumn,
+) -> PyResult<NormalizedColumn> {
+    let column = column.bind(py);
+    if let Ok(normalized) = column.extract::<NormalizedColumn>() {
+        return Ok(normalized);
+    }
+
+    let (name, logical_type, values) = column.extract()?;
+    Ok((name, logical_type, values, false))
 }
 
 fn parse_logical_type(value: &str) -> PyResult<LogicalType> {
@@ -242,9 +262,7 @@ fn parse_logical_type(value: &str) -> PyResult<LogicalType> {
     }
 }
 
-fn profile_value_from_python(py: Python<'_>, value: &Py<PyAny>) -> PyResult<ProfileValue> {
-    let value = value.bind(py);
-
+fn profile_value_from_bound(value: &Bound<'_, PyAny>) -> PyResult<ProfileValue> {
     if value.is_none() {
         Ok(ProfileValue::Null)
     } else if value.is_instance_of::<PyBool>() {
@@ -260,6 +278,40 @@ fn profile_value_from_python(py: Python<'_>, value: &Py<PyAny>) -> PyResult<Prof
             "Unsupported normalized value type '{}'",
             value.get_type().name()?
         )))
+    }
+}
+
+fn profile_value_from_raw_scalar(
+    value: &Bound<'_, PyAny>,
+    logical_type: &LogicalType,
+    column_name: &str,
+) -> PyResult<ProfileValue> {
+    match logical_type {
+        LogicalType::Integer => value
+            .extract::<i64>()
+            .map(ProfileValue::Integer)
+            .map_err(|_| {
+                PyTypeError::new_err(format!(
+                    "Column '{column_name}' contains an unsupported value"
+                ))
+            }),
+        LogicalType::Float => {
+            let value = value.extract::<f64>()?;
+            Ok(if value.is_nan() {
+                ProfileValue::Null
+            } else {
+                ProfileValue::Float(value)
+            })
+        }
+        LogicalType::Boolean => value
+            .extract::<bool>()
+            .map(ProfileValue::Boolean)
+            .map_err(|_| {
+                PyTypeError::new_err(format!(
+                    "Column '{column_name}' contains an unsupported value"
+                ))
+            }),
+        _ => profile_value_from_bound(value),
     }
 }
 
