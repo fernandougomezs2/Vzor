@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
+- v0.4.2-A makes Rust profiling borrow `DatasetInput` for the observed,
+  suggested, and inspection pipelines, eliminating their redundant deep input
+  clones without changing public behavior.
+
 ### Added
 
 - Local-only, reproducible benchmark and memory-inventory infrastructure for

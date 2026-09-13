@@ -171,7 +171,7 @@ estructurados siguen siendo el contrato.
 
 # v0.4 — Hardening, performance, escalabilidad y backends
 
-## v0.4.1 — Benchmark Baseline & Memory Inventory — IN DEVELOPMENT
+## v0.4.1 — Benchmark Baseline & Memory Inventory — COMPLETE
 
 La subfase crea infraestructura local y reproducible para medir runtime,
 throughput, tiempos de carga y peak working set/RSS contextualizado por
@@ -181,6 +181,15 @@ son stress-test targets bajo evaluación, no una afirmación de soporte general.
 
 No cambia runtime, bindings, API, contratos, persistencia, CLI, HTML, `repr`,
 ni las versiones `0.3.2`, `output_version = 1` y `format_version = 1`.
+
+## v0.4.2-A — Eliminar clones redundantes — COMPLETE
+
+Esta subfase limita el cambio a ownership interno Rust: profiling toma una
+referencia a `DatasetInput` para que observed schema, suggested schema e
+inspection no clonen sus vectores y strings de entrada. No cambia API, datos
+factuales, semánticas ni formatos. El conteo exacto de únicos, strings,
+normalización Python, buffers, GIL, Arrow, Polars y compare/drift quedan fuera
+de alcance para subfases posteriores.
 
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.

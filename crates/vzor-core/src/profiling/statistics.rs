@@ -119,7 +119,7 @@ mod tests {
         logical_type: LogicalType,
         values: Vec<ProfileValue>,
     ) -> Result<super::super::ColumnProfile, ProfilingError> {
-        super::super::profile_structure(super::super::DatasetInput::new(vec![column(
+        super::super::profile_structure(&super::super::DatasetInput::new(vec![column(
             "value",
             logical_type,
             values,
@@ -410,7 +410,7 @@ mod tests {
 
     #[test]
     fn mismatched_lengths_still_return_the_existing_error() {
-        let result = super::super::profile_structure(super::super::DatasetInput::new(vec![
+        let result = super::super::profile_structure(&super::super::DatasetInput::new(vec![
             column(
                 "first",
                 LogicalType::Integer,

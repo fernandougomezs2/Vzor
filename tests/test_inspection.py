@@ -44,6 +44,29 @@ def test_inspect_matches_all_specialized_apis() -> None:
     assert report.suggested_schema == vzor.suggest_schema(df)
 
 
+def test_inspect_matches_specialized_apis_for_clone_regression_edge_cases() -> None:
+    dataframe = pd.DataFrame(
+        {
+            "integer": pd.Series([1, pd.NA, 1, 4], dtype="Int64"),
+            "float": [1.0, float("nan"), float("inf"), float("-inf")],
+            "boolean": pd.Series([True, pd.NA, False, True], dtype="boolean"),
+            "datetime": pd.to_datetime(["2026-01-01", None, "2026-01-03", "2026-01-04"]),
+            "text": ["área", None, "東京", "área"],
+            "category": pd.Categorical(["small", "large", "small", "medium"]),
+            "all_null": pd.Series([None, None, None, None], dtype=object),
+            "high_cardinality_small": ["uno", "dos", "tres", "cuatro"],
+        }
+    )
+
+    first = vzor.inspect(dataframe)
+    second = vzor.inspect(dataframe)
+
+    assert first == second
+    assert first.profile == vzor.profile(dataframe)
+    assert first.observed_schema == vzor.observed_schema(dataframe)
+    assert first.suggested_schema == vzor.suggest_schema(dataframe)
+
+
 def test_mixed_dataframe_summary_counts_existing_results() -> None:
     report = vzor.inspect(mixed_dataframe())
 

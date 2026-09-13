@@ -5,7 +5,6 @@ use super::{
 };
 
 /// Input metadata and values for one column during the temporary profiling step.
-#[derive(Clone)]
 pub struct ColumnInput {
     pub name: String,
     pub logical_type: LogicalType,
@@ -23,7 +22,6 @@ impl ColumnInput {
 }
 
 /// Minimal dataset input for profiling. Row count is derived from column lengths.
-#[derive(Clone)]
 pub struct DatasetInput {
     pub columns: Vec<ColumnInput>,
 }
@@ -54,7 +52,7 @@ pub enum ProfilingError {
 /// `ProfileValue::Null` is the only null representation. Empty strings and
 /// values such as zero, false or NaN are not treated as null. Null values are
 /// excluded from `unique_count`, while `count` includes every position.
-pub fn profile_structure(input: DatasetInput) -> Result<DatasetProfile, ProfilingError> {
+pub fn profile_structure(input: &DatasetInput) -> Result<DatasetProfile, ProfilingError> {
     let row_count = input
         .columns
         .first()
@@ -72,7 +70,7 @@ pub fn profile_structure(input: DatasetInput) -> Result<DatasetProfile, Profilin
 
     let columns = input
         .columns
-        .into_iter()
+        .iter()
         .map(|column| {
             let null_count = count_nulls(&column.values);
             let unique_count = count_unique(&column.values);
@@ -80,8 +78,8 @@ pub fn profile_structure(input: DatasetInput) -> Result<DatasetProfile, Profilin
                 calculate_numeric_stats(&column.name, &column.logical_type, &column.values)?;
 
             Ok(ColumnProfile::new(
-                column.name,
-                column.logical_type,
+                column.name.clone(),
+                column.logical_type.clone(),
                 row_count,
                 null_count,
                 unique_count,
@@ -147,7 +145,7 @@ mod tests {
     }
 
     fn profile_for(values: Vec<ProfileValue>) -> ColumnProfile {
-        profile_structure(DatasetInput::new(vec![column(
+        profile_structure(&DatasetInput::new(vec![column(
             "value",
             LogicalType::Unknown,
             values,
@@ -189,7 +187,7 @@ mod tests {
 
     #[test]
     fn counts_unique_integers_strings_and_booleans() {
-        let profile = profile_structure(DatasetInput::new(vec![
+        let profile = profile_structure(&DatasetInput::new(vec![
             column(
                 "integer",
                 LogicalType::Integer,
@@ -278,7 +276,7 @@ mod tests {
 
     #[test]
     fn preserves_multiple_columns_and_their_counts() {
-        let profile = profile_structure(DatasetInput::new(vec![
+        let profile = profile_structure(&DatasetInput::new(vec![
             column(
                 "id",
                 LogicalType::Integer,
@@ -312,7 +310,7 @@ mod tests {
 
     #[test]
     fn rejects_columns_with_different_lengths() {
-        let result = profile_structure(DatasetInput::new(vec![
+        let result = profile_structure(&DatasetInput::new(vec![
             column(
                 "first",
                 LogicalType::Integer,
@@ -340,7 +338,7 @@ mod tests {
 
     #[test]
     fn empty_dataset_is_supported() {
-        let profile = profile_structure(DatasetInput::new(Vec::new())).unwrap();
+        let profile = profile_structure(&DatasetInput::new(Vec::new())).unwrap();
 
         assert_eq!(profile.row_count, 0);
         assert_eq!(profile.column_count(), 0);
@@ -348,7 +346,7 @@ mod tests {
 
     #[test]
     fn zero_rows_with_columns_is_supported() {
-        let profile = profile_structure(DatasetInput::new(vec![
+        let profile = profile_structure(&DatasetInput::new(vec![
             column("empty", LogicalType::Categorical, Vec::new()),
             column("date", LogicalType::Datetime, Vec::new()),
         ]))
@@ -359,5 +357,31 @@ mod tests {
         assert!(profile.columns.iter().all(|column| {
             column.count == 0 && column.null_count == 0 && column.unique_count == 0
         }));
+    }
+
+    #[test]
+    fn profiling_borrows_input_without_consuming_or_mutating_values() {
+        let input = DatasetInput::new(vec![column(
+            "label",
+            LogicalType::String,
+            vec![
+                ProfileValue::String("área".to_string()),
+                ProfileValue::Null,
+                ProfileValue::String("東京".to_string()),
+            ],
+        )]);
+
+        let profile = profile_structure(&input).unwrap();
+
+        assert_eq!(profile.columns[0].unique_count, 2);
+        assert_eq!(input.columns[0].name, "label");
+        assert_eq!(
+            input.columns[0].values,
+            vec![
+                ProfileValue::String("área".to_string()),
+                ProfileValue::Null,
+                ProfileValue::String("東京".to_string()),
+            ]
+        );
     }
 }

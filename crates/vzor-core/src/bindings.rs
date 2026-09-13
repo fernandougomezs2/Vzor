@@ -52,14 +52,14 @@ pub(crate) fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
 #[pyfunction]
 fn profile_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
-    let profile = profile_structure(input).map_err(profiling_error)?;
+    let profile = profile_structure(&input).map_err(profiling_error)?;
     dataset_profile_to_python(py, profile)
 }
 
 #[pyfunction]
 fn observed_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
-    let profile = profile_structure(input.clone()).map_err(profiling_error)?;
+    let profile = profile_structure(&input).map_err(profiling_error)?;
     let schema = observed_schema_from_profile_and_input(&profile, &input)
         .map_err(schema_observation_error)?;
 
@@ -69,7 +69,7 @@ fn observed_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> Py
 #[pyfunction]
 fn suggest_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
-    let profile = profile_structure(input.clone()).map_err(profiling_error)?;
+    let profile = profile_structure(&input).map_err(profiling_error)?;
     let observed = observed_schema_from_profile_and_input(&profile, &input)
         .map_err(schema_observation_error)?;
     let suggested = suggested_schema_from_observed(&observed);
@@ -80,7 +80,7 @@ fn suggest_schema_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyR
 #[pyfunction]
 fn inspect_dataset(py: Python<'_>, columns: Vec<NormalizedColumn>) -> PyResult<Py<PyAny>> {
     let input = dataset_input_from_python(py, columns)?;
-    let profile = profile_structure(input.clone()).map_err(profiling_error)?;
+    let profile = profile_structure(&input).map_err(profiling_error)?;
     let observed = observed_schema_from_profile_and_input(&profile, &input)
         .map_err(schema_observation_error)?;
     let suggested = suggested_schema_from_observed(&observed);
@@ -170,7 +170,7 @@ fn schema_drift_datasets(
 }
 
 fn observed_schema_from_input(input: &DatasetInput) -> PyResult<ObservedDatasetSchema> {
-    let profile = profile_structure(input.clone()).map_err(profiling_error)?;
+    let profile = profile_structure(input).map_err(profiling_error)?;
     observed_schema_from_profile_and_input(&profile, input).map_err(schema_observation_error)
 }
 

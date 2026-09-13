@@ -606,7 +606,7 @@ mod tests {
             ])
         }
 
-        let profile = profile_structure(source_input()).unwrap();
+        let profile = profile_structure(&source_input()).unwrap();
         let original = profile.clone();
         let observed = observed_schema_from_profile_and_input(&profile, &source_input()).unwrap();
 
@@ -844,7 +844,7 @@ mod tests {
                 ],
             ),
         ]);
-        let profile = profile_structure(input.clone()).unwrap();
+        let profile = profile_structure(&input).unwrap();
         let observed = observed_schema_from_profile_and_input(&profile, &input).unwrap();
         let original_observed = observed.clone();
 
