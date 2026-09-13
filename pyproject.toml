@@ -11,6 +11,9 @@ requires-python = ">=3.10"
 license = { file = "LICENSE" }
 dependencies = ["pandas>=2.0"]
 
+[project.optional-dependencies]
+polars = ["polars>=1.0"]
+
 [project.scripts]
 vzor = "vzor.cli:main"
 

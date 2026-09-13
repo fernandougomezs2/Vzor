@@ -7,7 +7,7 @@ from typing import Any
 import pandas as pd
 
 from ._human_summary import format_inspection_summary
-from ._pandas_adapter import _normalize_dataframe
+from ._frame_adapter import normalize_dataframe as _normalize_dataframe
 from ._repr import _format_compact_inspection_report, _format_dataclass
 from ._vzor_core import inspect_dataset as _inspect_dataset
 from .models import DatasetProfile

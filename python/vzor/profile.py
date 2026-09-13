@@ -4,14 +4,14 @@ from typing import Any
 
 import pandas as pd
 
-from ._pandas_adapter import _normalize_dataframe
+from ._frame_adapter import normalize_dataframe
 from ._vzor_core import profile_dataset as _profile_dataset
 from .models import ColumnProfile, DatasetProfile, NumericStats
 
 
 def profile(df: pd.DataFrame) -> DatasetProfile:
-    """Profile a pandas DataFrame using the Vzor Rust core."""
-    return _build_dataset_profile(_profile_dataset(_normalize_dataframe(df)))
+    """Profile a supported materialized DataFrame using the Vzor Rust core."""
+    return _build_dataset_profile(_profile_dataset(normalize_dataframe(df)))
 
 
 def _build_dataset_profile(data: dict[str, Any]) -> DatasetProfile:

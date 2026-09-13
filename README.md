@@ -20,6 +20,12 @@ Vzor profiles datasets, observes their structure, suggests conservative schemas,
 validates later inputs, compares snapshots, and detects structural schema drift.
 Its results are deterministic and local-first.
 
+## DataFrame backends
+
+Vzor supports pandas by default and an optional direct Polars backend. Install
+it with `pip install "vzor[polars]"`; no pandas conversion is required for a
+`polars.DataFrame`. LazyFrame is intentionally unsupported.
+
 ## What Vzor Does
 
 - Profiles pandas DataFrames.

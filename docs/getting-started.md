@@ -37,6 +37,12 @@ print(validation.human_summary)
 `inspect` returns an immutable `InspectionReport`. Its `summary` is structured,
 while `human_summary` is a short deterministic text.
 
+## Optional Polars backend
+
+Install `vzor[polars]` to pass a materialized `polars.DataFrame` to the same
+public API. pandas remains the default dependency; Vzor imports Polars lazily
+and does not support `polars.LazyFrame` in this release.
+
 ## Compact text and complete HTML
 
 ```python

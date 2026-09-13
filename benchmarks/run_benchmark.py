@@ -28,6 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Measure one Vzor operation without including load time.")
     parser.add_argument("--input", type=Path, required=True, help="CSV or Parquet dataset path.")
     parser.add_argument("--operation", choices=OPERATIONS, required=True, help="Vzor operation to measure.")
+    parser.add_argument("--backend", choices=("pandas", "polars"), default="pandas", help="DataFrame backend used to load the input.")
     parser.add_argument("--repeats", type=int, default=3, help="Independent runs (default: 3).")
     parser.add_argument("--profile", help="Optional dataset profile label recorded in JSON.")
     parser.add_argument("--seed", type=int, help="Optional generator seed recorded in JSON.")
@@ -42,13 +43,21 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def load_dataframe(path: Path) -> tuple[pd.DataFrame, float]:
+def load_dataframe(path: Path, backend: str = "pandas") -> tuple[Any, float]:
     start = time.perf_counter()
     suffix = path.suffix.lower()
-    if suffix == ".parquet":
+    if backend == "pandas" and suffix == ".parquet":
         dataframe = pd.read_parquet(path)
-    elif suffix == ".csv":
+    elif backend == "pandas" and suffix == ".csv":
         dataframe = pd.read_csv(path)
+    elif backend == "polars" and suffix == ".parquet":
+        import polars as pl
+
+        dataframe = pl.read_parquet(path)
+    elif backend == "polars" and suffix == ".csv":
+        import polars as pl
+
+        dataframe = pl.read_csv(path)
     else:
         raise ValueError("input must be a .parquet or .csv file")
     return dataframe, time.perf_counter() - start
@@ -124,7 +133,9 @@ def _operation_callable(operation: str, dataframe: pd.DataFrame):
 
 
 def single_run(args: argparse.Namespace) -> dict[str, Any]:
-    dataframe, load_seconds = load_dataframe(args.input)
+    dataframe, load_seconds = load_dataframe(args.input, args.backend)
+    if args.backend == "polars" and args.operation not in {"profile", "inspect"}:
+        raise ValueError("Polars benchmark currently supports profile and inspect only")
     operation = _operation_callable(args.operation, dataframe)
     before_memory = process_memory()
     start = time.perf_counter()
@@ -141,6 +152,7 @@ def single_run(args: argparse.Namespace) -> dict[str, Any]:
     )
     result.update(
         {
+            "backend": args.backend,
             "parquet_load_seconds": load_seconds if args.input.suffix.lower() == ".parquet" else None,
             "input_load_seconds": load_seconds,
             "elapsed_seconds": elapsed,
@@ -167,6 +179,8 @@ def _child_command(args: argparse.Namespace) -> list[str]:
         str(args.input),
         "--operation",
         args.operation,
+        "--backend",
+        args.backend,
         "--repeats",
         "1",
         "--isolation",

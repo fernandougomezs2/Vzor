@@ -9,7 +9,7 @@ from typing import Any
 import pandas as pd
 
 from ._human_summary import format_validation_summary
-from ._pandas_adapter import _normalize_dataframe
+from ._frame_adapter import normalize_dataframe as _normalize_dataframe
 from ._repr import _format_compact_validation_report, _format_dataclass
 from ._vzor_core import _validate_dataset_schema
 from .suggested_schema import SuggestedDatasetSchema

@@ -5,7 +5,7 @@ from typing import Any
 
 import pandas as pd
 
-from ._pandas_adapter import _normalize_dataframe
+from ._frame_adapter import normalize_dataframe
 from ._repr import _format_dataclass
 from ._vzor_core import observed_schema_dataset as _observed_schema_dataset
 
@@ -64,7 +64,7 @@ class ObservedDatasetSchema:
 
 def observed_schema(df: pd.DataFrame) -> ObservedDatasetSchema:
     """Return observed structure and values without inferring constraints."""
-    data = _observed_schema_dataset(_normalize_dataframe(df))
+    data = _observed_schema_dataset(normalize_dataframe(df))
     return _build_observed_dataset_schema(data)
 
 

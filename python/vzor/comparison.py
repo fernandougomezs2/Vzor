@@ -9,7 +9,7 @@ from typing import Any
 import pandas as pd
 
 from ._human_summary import format_comparison_summary
-from ._pandas_adapter import _normalize_dataframe
+from ._frame_adapter import normalize_dataframe as _normalize_dataframe
 from ._repr import _format_compact_comparison_report, _format_dataclass
 from ._vzor_core import compare_datasets as _compare_datasets
 from .observed_schema import ObservedColumnSchema, _build_observed_column_schema

@@ -4,6 +4,8 @@
 
 ### Changed
 
+- v0.4.3 adds an optional direct Polars DataFrame backend through private
+  normalization, including mixed pandas/Polars compare and schema drift.
 - v0.4.2-E completes the hardening audit and reruns the local final benchmark
   matrix. It records measured performance and memory changes without changing
   runtime behavior, public contracts, dependencies, or package versions.

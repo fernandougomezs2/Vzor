@@ -9,7 +9,7 @@ from typing import Any
 import pandas as pd
 
 from ._human_summary import format_schema_drift_summary
-from ._pandas_adapter import _normalize_dataframe
+from ._frame_adapter import normalize_dataframe as _normalize_dataframe
 from ._repr import _format_compact_schema_drift_report, _format_dataclass
 from ._vzor_core import schema_drift_datasets as _schema_drift_datasets
 

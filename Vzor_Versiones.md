@@ -228,6 +228,13 @@ extrapolación conservadora requería ~8.36 GiB en un equipo de 15.34 GiB sin
 telemetría fiable de memoria libre; no se generó bajo riesgo de paginación.
 No se cambiaron runtime, API, semánticas, dependencias, versiones ni formatos.
 
+## v0.4.3 — Polars Backend — COMPLETE
+
+Vzor acepta `polars.DataFrame` materializado mediante el extra opcional
+`vzor[polars]`, sin conversión a pandas ni API nueva. Pandas sigue intacto;
+LazyFrame queda fuera de alcance. La normalización privada permite también
+compare y drift entre ambos backends. Detalles y límites: `docs/v0.4.3-polars-backend.md`.
+
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.
 

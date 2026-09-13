@@ -5,7 +5,7 @@ from typing import Any
 
 import pandas as pd
 
-from ._pandas_adapter import _normalize_dataframe
+from ._frame_adapter import normalize_dataframe
 from ._repr import _format_dataclass
 from ._vzor_core import suggest_schema_dataset as _suggest_schema_dataset
 
@@ -72,7 +72,7 @@ class SuggestedDatasetSchema:
 
 def suggest_schema(df: pd.DataFrame) -> SuggestedDatasetSchema:
     """Generate a conservative initial schema proposal from observations."""
-    data = _suggest_schema_dataset(_normalize_dataframe(df))
+    data = _suggest_schema_dataset(normalize_dataframe(df))
     return _build_suggested_dataset_schema(data)
 
 

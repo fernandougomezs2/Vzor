@@ -88,9 +88,22 @@ inspection.human_summary
 raises `KeyError("Column '<name>' not found")` when absent. Do not add fuzzy
 matching or silent `None` lookups.
 
+## Supported DataFrame Backends
+
+Current public Python API inputs are materialized `pandas.DataFrame` and,
+when the optional `vzor[polars]` extra is installed, `polars.DataFrame`.
+Polars is imported lazily and is never a mandatory runtime dependency.
+`polars.LazyFrame`, Series, Arrow tables, dicts, and lists are unsupported.
+Mixed pandas/Polars `compare` and `schema_drift` are supported through the
+same private normalized input. Suggested Schema remains a proposal, not a Data
+Contract; transformations remain pandas/Polars responsibilities.
+
 ## Data Model Semantics
 
 The pandas adapter treats `None`, `pd.NA`, `pd.NaT`, and `np.nan` as null.
+The Polars adapter treats `null` and floating `NaN` as null for the same Vzor
+contract; `+inf` and `-inf` remain non-null. Both adapters preserve empty and
+Unicode strings as values.
 Empty strings, the strings `"NULL"`, `"NaN"`, and `"None"`, `0`, and `False`
 are not null automatically.
 
