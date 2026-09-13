@@ -107,21 +107,21 @@ fn count_unique(values: &[ProfileValue]) -> usize {
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
-enum UniqueValue {
+enum UniqueValue<'a> {
     Integer(i64),
     Float(u64),
     Boolean(bool),
-    String(String),
+    String(&'a str),
 }
 
-impl UniqueValue {
-    fn from_profile_value(value: &ProfileValue) -> Option<Self> {
+impl<'a> UniqueValue<'a> {
+    fn from_profile_value(value: &'a ProfileValue) -> Option<Self> {
         match value {
             ProfileValue::Null => None,
             ProfileValue::Integer(value) => Some(Self::Integer(*value)),
             ProfileValue::Float(value) => Some(Self::Float(normalize_float(*value))),
             ProfileValue::Boolean(value) => Some(Self::Boolean(*value)),
-            ProfileValue::String(value) => Some(Self::String(value.clone())),
+            ProfileValue::String(value) => Some(Self::String(value.as_str())),
         }
     }
 }

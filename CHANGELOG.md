@@ -4,6 +4,9 @@
 
 ### Changed
 
+- v0.4.2-C makes exact unique counting borrow input string slices while it
+  profiles, removing the per-distinct-string `HashSet<String>` clone. Observed
+  values retain their existing bounded, owned output behavior.
 - v0.4.2-B removes the private whole-column normalized Python list and PyO3
   `Vec<Py<PyAny>>` materialization between pandas and Rust. It preserves the
   existing dtype, null, overflow, error, API, and output contracts.

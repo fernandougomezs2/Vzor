@@ -173,7 +173,7 @@ fn collect_observed_values(
     match logical_type {
         LogicalType::Boolean => Some(collect_booleans(values)),
         LogicalType::String | LogicalType::Categorical if unique_count <= MAX_OBSERVED_VALUES => {
-            Some(collect_strings(values))
+            Some(collect_strings(values, unique_count))
         }
         _ => None,
     }
@@ -194,9 +194,9 @@ fn collect_booleans(values: &[ProfileValue]) -> Vec<ObservedValue> {
     observed
 }
 
-fn collect_strings(values: &[ProfileValue]) -> Vec<ObservedValue> {
-    let mut seen = HashSet::new();
-    let mut observed = Vec::new();
+fn collect_strings(values: &[ProfileValue], unique_count: usize) -> Vec<ObservedValue> {
+    let mut seen = HashSet::with_capacity(unique_count);
+    let mut observed = Vec::with_capacity(unique_count);
 
     for value in values {
         if let ProfileValue::String(value) = value {

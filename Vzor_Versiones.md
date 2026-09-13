@@ -201,6 +201,14 @@ nulls, overflow, errores y transporte datetime existentes. Rust conserva su
 `Vec<ProfileValue>` propio. No hay API nueva, cambios semánticos, dependencias,
 Arrow, Polars, unsafe, paralelismo ni cambio de versión.
 
+## v0.4.2-C — Optimización String y unique_count exacto — COMPLETE
+
+El conteo exacto de únicos presta `&str` desde `DatasetInput` mientras perfila,
+en lugar de clonar cada string distinto para `HashSet<String>`. Los valores
+observados siguen siendo propios, ordenados y limitados a 50; alta cardinalidad
+mantiene `observed_values = None` sin clonar masivamente. No cambia API,
+exactitud, orden, hasher, dependencias, unsafe ni versiones.
+
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.
 
