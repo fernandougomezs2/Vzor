@@ -13,6 +13,43 @@ pub fn compare_observed_schemas(
     before: &ObservedDatasetSchema,
     after: &ObservedDatasetSchema,
 ) -> ComparisonResult {
+    let mut columns = Vec::with_capacity(before.columns.len() + after.columns.len());
+    visit_comparison_columns(before, after, |column| {
+        columns.push(ColumnComparison {
+            name: column.name.to_string(),
+            status: column.status,
+            before: column.before.cloned(),
+            after: column.after.cloned(),
+            changes: column.changes,
+        });
+    });
+
+    ComparisonResult {
+        before_row_count: before.row_count,
+        after_row_count: after.row_count,
+        columns,
+    }
+}
+
+/// One ephemeral factual column comparison used by internal consumers.
+///
+/// The references are valid only for the comparison traversal. Public
+/// `ComparisonResult` snapshots them into owned values; consumers that need
+/// only facts, such as schema drift, can avoid that allocation.
+pub(crate) struct ComparisonColumnFacts<'a> {
+    pub name: &'a str,
+    pub status: ComparisonStatus,
+    pub before: Option<&'a ObservedColumnSchema>,
+    pub after: Option<&'a ObservedColumnSchema>,
+    pub changes: Vec<ComparisonChangeCode>,
+}
+
+/// Visit factual column comparisons in the public deterministic order.
+pub(crate) fn visit_comparison_columns<'a>(
+    before: &'a ObservedDatasetSchema,
+    after: &'a ObservedDatasetSchema,
+    mut visit: impl FnMut(ComparisonColumnFacts<'a>),
+) {
     let after_by_name = after
         .columns
         .iter()
@@ -23,7 +60,6 @@ pub fn compare_observed_schemas(
         .iter()
         .map(|column| column.name.as_str())
         .collect::<HashSet<_>>();
-    let mut columns = Vec::with_capacity(before.columns.len() + after.columns.len());
 
     for before_column in &before.columns {
         match after_by_name.get(before_column.name.as_str()) {
@@ -35,18 +71,18 @@ pub fn compare_observed_schemas(
                     ComparisonStatus::Changed
                 };
 
-                columns.push(ColumnComparison {
-                    name: before_column.name.clone(),
+                visit(ComparisonColumnFacts {
+                    name: before_column.name.as_str(),
                     status,
-                    before: Some(before_column.clone()),
-                    after: Some((*after_column).clone()),
+                    before: Some(before_column),
+                    after: Some(*after_column),
                     changes,
                 });
             }
-            None => columns.push(ColumnComparison {
-                name: before_column.name.clone(),
+            None => visit(ComparisonColumnFacts {
+                name: before_column.name.as_str(),
                 status: ComparisonStatus::Removed,
-                before: Some(before_column.clone()),
+                before: Some(before_column),
                 after: None,
                 changes: Vec::new(),
             }),
@@ -55,20 +91,14 @@ pub fn compare_observed_schemas(
 
     for after_column in &after.columns {
         if !before_names.contains(after_column.name.as_str()) {
-            columns.push(ColumnComparison {
-                name: after_column.name.clone(),
+            visit(ComparisonColumnFacts {
+                name: after_column.name.as_str(),
                 status: ComparisonStatus::Added,
                 before: None,
-                after: Some(after_column.clone()),
+                after: Some(after_column),
                 changes: Vec::new(),
             });
         }
-    }
-
-    ComparisonResult {
-        before_row_count: before.row_count,
-        after_row_count: after.row_count,
-        columns,
     }
 }
 

@@ -209,6 +209,14 @@ observados siguen siendo propios, ordenados y limitados a 50; alta cardinalidad
 mantiene `observed_values = None` sin clonar masivamente. No cambia API,
 exactitud, orden, hasher, dependencias, unsafe ni versiones.
 
+## v0.4.2-D — Optimización Compare y Schema Drift — COMPLETE
+
+Compare conserva snapshots completos porque son parte de su resultado. Schema
+drift reutiliza un recorrido factual interno y usa una ruta estructural privada
+que evita unique count, rangos, valores observados y snapshots que drift no
+interpreta. Mantiene orden, códigos, severidades, errores numéricos y API; no
+hay caché, estado global, unsafe, dependencias ni cambio de versión.
+
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.
 

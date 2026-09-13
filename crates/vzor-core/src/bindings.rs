@@ -20,7 +20,8 @@ use crate::schema::{
     SuggestedValue,
 };
 use crate::schema_drift::{
-    detect_schema_drift, SchemaDriftCode, SchemaDriftIssue, SchemaDriftResult, SchemaDriftSeverity,
+    detect_schema_drift_from_input, SchemaDriftCode, SchemaDriftIssue, SchemaDriftResult,
+    SchemaDriftSeverity,
 };
 use crate::validation::{
     validate_dataset, ValidationCode, ValidationIssue, ValidationResult, ValidationSeverity,
@@ -162,10 +163,8 @@ fn schema_drift_datasets(
 ) -> PyResult<Py<PyAny>> {
     let before_input = dataset_input_from_python(py, before_columns)?;
     let after_input = dataset_input_from_python(py, after_columns)?;
-    let before = observed_schema_from_input(&before_input)?;
-    let after = observed_schema_from_input(&after_input)?;
-    let comparison = compare_observed_schemas(&before, &after);
-    let result = detect_schema_drift(&comparison);
+    let result =
+        detect_schema_drift_from_input(&before_input, &after_input).map_err(profiling_error)?;
 
     schema_drift_result_to_python(py, result)
 }

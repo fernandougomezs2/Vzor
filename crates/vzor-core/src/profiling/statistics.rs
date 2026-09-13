@@ -19,25 +19,8 @@ pub(crate) fn calculate_numeric_stats(
 
     let mut numeric_values = Vec::new();
     for value in values {
-        match (logical_type, value) {
-            (_, ProfileValue::Null) => {}
-            (LogicalType::Integer, ProfileValue::Integer(value)) => {
-                numeric_values.push(*value as f64);
-            }
-            (LogicalType::Float, ProfileValue::Integer(value)) => {
-                numeric_values.push(*value as f64);
-            }
-            (LogicalType::Float, ProfileValue::Float(value)) if value.is_finite() => {
-                numeric_values.push(*value);
-            }
-            (LogicalType::Float, ProfileValue::Float(_)) => {}
-            (_, value) => {
-                return Err(ProfilingError::ValueTypeMismatch {
-                    column: column_name.to_string(),
-                    expected: logical_type.clone(),
-                    actual: value_type_name(value).to_string(),
-                });
-            }
+        if let Some(value) = numeric_value_for_profile(column_name, logical_type, value)? {
+            numeric_values.push(value);
         }
     }
 
@@ -64,6 +47,33 @@ pub(crate) fn calculate_numeric_stats(
         p50,
         p75,
     }))
+}
+
+/// Validates one numeric input value and returns its finite statistic value.
+///
+/// Non-numeric logical types return `None` without validation, matching the
+/// profiling contract. This is shared by structural-only consumers that must
+/// preserve numeric type errors without calculating statistics.
+pub(crate) fn numeric_value_for_profile(
+    column_name: &str,
+    logical_type: &LogicalType,
+    value: &ProfileValue,
+) -> Result<Option<f64>, ProfilingError> {
+    match (logical_type, value) {
+        (LogicalType::Integer | LogicalType::Float, ProfileValue::Null) => Ok(None),
+        (LogicalType::Integer, ProfileValue::Integer(value)) => Ok(Some(*value as f64)),
+        (LogicalType::Float, ProfileValue::Integer(value)) => Ok(Some(*value as f64)),
+        (LogicalType::Float, ProfileValue::Float(value)) if value.is_finite() => Ok(Some(*value)),
+        (LogicalType::Float, ProfileValue::Float(_)) => Ok(None),
+        (LogicalType::Integer | LogicalType::Float, value) => {
+            Err(ProfilingError::ValueTypeMismatch {
+                column: column_name.to_string(),
+                expected: logical_type.clone(),
+                actual: value_type_name(value).to_string(),
+            })
+        }
+        _ => Ok(None),
+    }
 }
 
 fn finite_mean(values: &[f64], min: f64, max: f64) -> f64 {

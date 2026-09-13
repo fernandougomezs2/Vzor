@@ -1,4 +1,12 @@
-use crate::comparison::{ComparisonChangeCode, ComparisonResult, ComparisonStatus};
+use std::collections::{HashMap, HashSet};
+
+use crate::{
+    comparison::{
+        visit_comparison_columns, ComparisonChangeCode, ComparisonResult, ComparisonStatus,
+    },
+    profiling::{numeric_value_for_profile, DatasetInput, ProfileValue, ProfilingError},
+    schema::{ObservedColumnSchema, ObservedDatasetSchema},
+};
 
 use super::{SchemaDriftCode, SchemaDriftIssue, SchemaDriftResult, SchemaDriftSeverity};
 
@@ -11,47 +19,167 @@ pub fn detect_schema_drift(comparison: &ComparisonResult) -> SchemaDriftResult {
     let mut issues = Vec::new();
 
     for column in &comparison.columns {
-        match column.status {
-            ComparisonStatus::Added => issues.push(issue(
-                SchemaDriftCode::ColumnAdded,
-                SchemaDriftSeverity::Warning,
-                &column.name,
-            )),
-            ComparisonStatus::Removed => issues.push(issue(
-                SchemaDriftCode::ColumnRemoved,
-                SchemaDriftSeverity::Error,
-                &column.name,
-            )),
-            ComparisonStatus::Changed => {
-                if column
-                    .changes
-                    .contains(&ComparisonChangeCode::LogicalTypeChanged)
-                {
-                    issues.push(issue(
-                        SchemaDriftCode::LogicalTypeChanged,
-                        SchemaDriftSeverity::Error,
-                        &column.name,
-                    ));
-                }
-
-                if column
-                    .changes
-                    .contains(&ComparisonChangeCode::NullabilityChanged)
-                {
-                    if let Some(severity) = nullability_severity(column) {
-                        issues.push(issue(
-                            SchemaDriftCode::NullabilityChanged,
-                            severity,
-                            &column.name,
-                        ));
-                    }
-                }
-            }
-            ComparisonStatus::Unchanged => {}
-        }
+        append_drift_issues(
+            &mut issues,
+            column.status,
+            &column.name,
+            &column.changes,
+            column.before.as_ref(),
+            column.after.as_ref(),
+        );
     }
 
     SchemaDriftResult { issues }
+}
+
+/// Detects drift from the same factual comparison traversal without creating
+/// owned comparison snapshots that schema-drift output does not expose.
+pub fn detect_schema_drift_from_observed_schemas(
+    before: &ObservedDatasetSchema,
+    after: &ObservedDatasetSchema,
+) -> SchemaDriftResult {
+    let mut issues = Vec::new();
+
+    visit_comparison_columns(before, after, |column| {
+        append_drift_issues(
+            &mut issues,
+            column.status,
+            column.name,
+            &column.changes,
+            column.before,
+            column.after,
+        );
+    });
+
+    SchemaDriftResult { issues }
+}
+
+/// Detects drift from normalized inputs without profiling properties that the
+/// drift contract intentionally ignores, such as unique count and ranges.
+pub fn detect_schema_drift_from_input(
+    before: &DatasetInput,
+    after: &DatasetInput,
+) -> Result<SchemaDriftResult, ProfilingError> {
+    let before_nullability = structural_nullability(before)?;
+    let after_nullability = structural_nullability(after)?;
+    let after_by_name = after
+        .columns
+        .iter()
+        .zip(after_nullability)
+        .map(|(column, nullable)| (column.name.as_str(), (column, nullable)))
+        .collect::<HashMap<_, _>>();
+    let before_names = before
+        .columns
+        .iter()
+        .map(|column| column.name.as_str())
+        .collect::<HashSet<_>>();
+    let mut issues = Vec::new();
+
+    for (before_column, before_nullable) in before.columns.iter().zip(before_nullability) {
+        match after_by_name.get(before_column.name.as_str()).copied() {
+            Some((after_column, after_nullable)) => {
+                if before_column.logical_type != after_column.logical_type {
+                    issues.push(issue(
+                        SchemaDriftCode::LogicalTypeChanged,
+                        SchemaDriftSeverity::Error,
+                        &before_column.name,
+                    ));
+                }
+                if before_nullable != after_nullable {
+                    issues.push(issue(
+                        SchemaDriftCode::NullabilityChanged,
+                        nullability_severity_from_values(before_nullable, after_nullable),
+                        &before_column.name,
+                    ));
+                }
+            }
+            None => issues.push(issue(
+                SchemaDriftCode::ColumnRemoved,
+                SchemaDriftSeverity::Error,
+                &before_column.name,
+            )),
+        }
+    }
+
+    for after_column in &after.columns {
+        if !before_names.contains(after_column.name.as_str()) {
+            issues.push(issue(
+                SchemaDriftCode::ColumnAdded,
+                SchemaDriftSeverity::Warning,
+                &after_column.name,
+            ));
+        }
+    }
+
+    Ok(SchemaDriftResult { issues })
+}
+
+fn structural_nullability(input: &DatasetInput) -> Result<Vec<bool>, ProfilingError> {
+    let row_count = input
+        .columns
+        .first()
+        .map_or(0, |column| column.values.len());
+
+    for column in &input.columns {
+        if column.values.len() != row_count {
+            return Err(ProfilingError::ColumnLengthMismatch {
+                column: column.name.clone(),
+                expected: row_count,
+                actual: column.values.len(),
+            });
+        }
+    }
+
+    input
+        .columns
+        .iter()
+        .map(|column| {
+            let mut nullable = false;
+            for value in &column.values {
+                nullable |= matches!(value, ProfileValue::Null);
+                numeric_value_for_profile(&column.name, &column.logical_type, value)?;
+            }
+            Ok(nullable)
+        })
+        .collect()
+}
+
+fn append_drift_issues(
+    issues: &mut Vec<SchemaDriftIssue>,
+    status: ComparisonStatus,
+    name: &str,
+    changes: &[ComparisonChangeCode],
+    before: Option<&ObservedColumnSchema>,
+    after: Option<&ObservedColumnSchema>,
+) {
+    match status {
+        ComparisonStatus::Added => issues.push(issue(
+            SchemaDriftCode::ColumnAdded,
+            SchemaDriftSeverity::Warning,
+            name,
+        )),
+        ComparisonStatus::Removed => issues.push(issue(
+            SchemaDriftCode::ColumnRemoved,
+            SchemaDriftSeverity::Error,
+            name,
+        )),
+        ComparisonStatus::Changed => {
+            if changes.contains(&ComparisonChangeCode::LogicalTypeChanged) {
+                issues.push(issue(
+                    SchemaDriftCode::LogicalTypeChanged,
+                    SchemaDriftSeverity::Error,
+                    name,
+                ));
+            }
+
+            if changes.contains(&ComparisonChangeCode::NullabilityChanged) {
+                if let Some(severity) = nullability_severity(before, after) {
+                    issues.push(issue(SchemaDriftCode::NullabilityChanged, severity, name));
+                }
+            }
+        }
+        ComparisonStatus::Unchanged => {}
+    }
 }
 
 fn issue(code: SchemaDriftCode, severity: SchemaDriftSeverity, column: &str) -> SchemaDriftIssue {
@@ -63,9 +191,10 @@ fn issue(code: SchemaDriftCode, severity: SchemaDriftSeverity, column: &str) -> 
 }
 
 fn nullability_severity(
-    column: &crate::comparison::ColumnComparison,
+    before: Option<&ObservedColumnSchema>,
+    after: Option<&ObservedColumnSchema>,
 ) -> Option<SchemaDriftSeverity> {
-    let (Some(before), Some(after)) = (column.before.as_ref(), column.after.as_ref()) else {
+    let (Some(before), Some(after)) = (before, after) else {
         return None;
     };
 
@@ -76,13 +205,29 @@ fn nullability_severity(
     }
 }
 
+fn nullability_severity_from_values(
+    before_nullable: bool,
+    after_nullable: bool,
+) -> SchemaDriftSeverity {
+    match (before_nullable, after_nullable) {
+        (false, true) => SchemaDriftSeverity::Error,
+        (true, false) => SchemaDriftSeverity::Warning,
+        (false, false) | (true, true) => {
+            unreachable!("a drift issue is emitted only for changed nullability")
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::{
-        comparison::{ColumnComparison, ComparisonChangeCode, ComparisonResult, ComparisonStatus},
+        comparison::{
+            compare_observed_schemas, ColumnComparison, ComparisonChangeCode, ComparisonResult,
+            ComparisonStatus,
+        },
         profiling::LogicalType,
-        schema::ObservedColumnSchema,
+        schema::{ObservedColumnSchema, ObservedDatasetSchema},
     };
 
     fn snapshot(name: &str, nullable: bool) -> ObservedColumnSchema {
@@ -451,5 +596,37 @@ mod tests {
 
         assert_eq!(result, original);
         assert_eq!(first, second);
+    }
+
+    #[test]
+    fn direct_schema_drift_matches_the_owned_comparison_pipeline() {
+        let before = ObservedDatasetSchema::new(
+            2,
+            vec![
+                snapshot("id", false),
+                snapshot("removed", false),
+                snapshot("nullable", false),
+            ],
+        );
+        let after = ObservedDatasetSchema::new(
+            3,
+            vec![
+                snapshot("nullable", true),
+                ObservedColumnSchema::new(
+                    "id".to_string(),
+                    LogicalType::Float,
+                    false,
+                    2,
+                    None,
+                    None,
+                ),
+                snapshot("added", false),
+            ],
+        );
+
+        let owned = detect_schema_drift(&compare_observed_schemas(&before, &after));
+        let direct = detect_schema_drift_from_observed_schemas(&before, &after);
+
+        assert_eq!(direct, owned);
     }
 }

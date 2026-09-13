@@ -9,8 +9,9 @@ v0.4.1 cerró la infraestructura de benchmarks locales y el inventario de
 memoria. v0.4.2-A cerró la eliminación de clones internos redundantes de
 `DatasetInput`. v0.4.2-B cerró la reducción de materialización transitoria en
 la frontera privada pandas/PyO3 y v0.4.2-C eliminó clones redundantes de
-strings durante el conteo exacto de únicos; no modifican el runtime público ni
-implican soporte general para datasets de 5M filas. Los reportes
+strings durante el conteo exacto de únicos. v0.4.2-D redujo trabajo interno de
+schema drift que no forma parte de su contrato; no modifican el runtime público
+ni implican soporte general para datasets de 5M filas. Los reportes
 mantienen todos sus datos y HTML completo, mientras que su `repr` de alto nivel
 presenta summaries y previews estructurales acotados. El paquete es `0.3.2`.
 

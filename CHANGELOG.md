@@ -4,6 +4,9 @@
 
 ### Changed
 
+- v0.4.2-D shares factual column traversal internally and lets schema drift
+  avoid profile, observed-schema, and comparison-snapshot work it does not
+  expose, while preserving structural error and ordering contracts.
 - v0.4.2-C makes exact unique counting borrow input string slices while it
   profiles, removing the per-distinct-string `HashSet<String>` clone. Observed
   values retain their existing bounded, owned output behavior.
