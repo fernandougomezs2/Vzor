@@ -4,6 +4,9 @@
 
 ### Changed
 
+- v0.4.2-E completes the hardening audit and reruns the local final benchmark
+  matrix. It records measured performance and memory changes without changing
+  runtime behavior, public contracts, dependencies, or package versions.
 - v0.4.2-D shares factual column traversal internally and lets schema drift
   avoid profile, observed-schema, and comparison-snapshot work it does not
   expose, while preserving structural error and ordering contracts.

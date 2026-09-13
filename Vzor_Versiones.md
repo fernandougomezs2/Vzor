@@ -217,6 +217,17 @@ que evita unique count, rangos, valores observados y snapshots que drift no
 interpreta. Mantiene orden, códigos, severidades, errores numéricos y API; no
 hay caché, estado global, unsafe, dependencias ni cambio de versión.
 
+## v0.4.2-E — Performance Hardening & Final Benchmark — COMPLETE
+
+La subfase cierra v0.4.2 con una auditoría de contratos, dependencias y
+determinismo, las suites Rust/Python y una matriz final reproducible de 100k y
+1M filas. El reporte `docs/v0.4.2-e-final-performance-report.md` conserva los
+tiempos, throughput, lectura y peak working set, junto con la comparación
+contra v0.4.1. El stress test 5M queda sin ejecutar: no existía fixture y la
+extrapolación conservadora requería ~8.36 GiB en un equipo de 15.34 GiB sin
+telemetría fiable de memoria libre; no se generó bajo riesgo de paginación.
+No se cambiaron runtime, API, semánticas, dependencias, versiones ni formatos.
+
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.
 
