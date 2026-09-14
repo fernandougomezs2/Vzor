@@ -119,5 +119,5 @@ jobs:
           manylinux: 2_28
       - run: python -m venv fresh-polars-venv
       - run: fresh-polars-venv/bin/python -m pip install --upgrade pip
-      - run: fresh-polars-venv/bin/python -m pip install "vzor[polars] @ file://$GITHUB_WORKSPACE/$(basename $(find dist -name '*.whl' -print -quit))"
+      - run: fresh-polars-venv/bin/python -m pip install "vzor[polars] @ file://$GITHUB_WORKSPACE/dist/$(basename $(find dist -name '*.whl' -print -quit))"
       - run: fresh-polars-venv/bin/python -c "import pandas as pd, polars as pl, vzor; p=pd.DataFrame({'id':[1,2]}); q=pl.DataFrame({'id':[1,2]}); assert vzor.inspect(q).row_count == 2; assert vzor.validate(q,vzor.suggest_schema(p)).is_valid; assert not vzor.compare(p,q).has_changes; assert not vzor.schema_drift(q,p).has_drift"
