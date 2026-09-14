@@ -166,6 +166,12 @@ def single_run(args: argparse.Namespace) -> dict[str, Any]:
             ),
             "working_set_before_operation_bytes": before_memory["current_working_set_bytes"],
             "working_set_after_operation_bytes": after_memory["current_working_set_bytes"],
+            "peak_delta_above_loaded_dataframe_bytes": (
+                after_memory["peak_memory_bytes"] - before_memory["current_working_set_bytes"]
+                if after_memory["peak_memory_bytes"] is not None
+                and before_memory["current_working_set_bytes"] is not None
+                else None
+            ),
         }
     )
     return result

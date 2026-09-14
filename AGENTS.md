@@ -98,6 +98,14 @@ Mixed pandas/Polars `compare` and `schema_drift` are supported through the
 same private normalized input. Suggested Schema remains a proposal, not a Data
 Contract; transformations remain pandas/Polars responsibilities.
 
+The current fast paths use direct scalar transport only for safe non-null
+numeric/Boolean columns. Rust owns final values; no adapter claims zero-copy,
+borrowed buffers, Arrow transport, or global thread configuration.
+
+Performance and large-data claims require benchmark context: backend, profile,
+operation, hardware, peak working set and guardrail decision. Do not infer 5M,
+20M, or 50M support from another profile or machine.
+
 ## Data Model Semantics
 
 The pandas adapter treats `None`, `pd.NA`, `pd.NaT`, and `np.nan` as null.

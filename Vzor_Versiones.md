@@ -235,6 +235,23 @@ Vzor acepta `polars.DataFrame` materializado mediante el extra opcional
 LazyFrame queda fuera de alcance. La normalización privada permite también
 compare y drift entre ambos backends. Detalles y límites: `docs/v0.4.3-polars-backend.md`.
 
+## v0.4.4 — Cross-Backend Parity & Efficient Buffers — COMPLETE
+
+La frontera privada conserva un `DatasetInput` propio en Rust. Polars evita su
+generador/normalizador Python para numéricos y Boolean no-null mediante la ruta
+typed existente; nullables, UInt64, strings, categorías y temporal conservan
+fallbacks comprobados. No hay zero-copy, Arrow obligatorio, unsafe, GIL release
+ni cambio de contratos. Auditoría, clasificación y benchmarks en
+`docs/v0.4.4-cross-backend-buffers.md`.
+
+## v0.4.5 — Large-Data Hardening — COMPLETE
+
+La infraestructura de benchmarks ahora registra memoria física disponible y el
+delta peak sobre el DataFrame cargado, con un guardrail externo del 70% para
+decidir escalado progresivo. En el hardware documentado se stress-testearon
+baseline Polars hasta 2M filas; 3M y 5M quedaron bloqueados por seguridad, no
+como una afirmación de soporte. Detalles: `docs/v0.4.5-large-data-hardening.md`.
+
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.
 

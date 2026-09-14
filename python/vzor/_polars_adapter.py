@@ -31,10 +31,12 @@ def normalize_polars_dataframe(df: Any) -> list[NormalizedColumn]:
     if any(not isinstance(name, str) for name in df.columns):
         raise TypeError("DataFrame column names must be strings")
 
-    return [
-        (name, _infer_logical_type(series.dtype), _normalized_values(series, name), False)
-        for name, series in zip(df.columns, df.iter_columns(), strict=True)
-    ]
+    columns = []
+    for name, series in zip(df.columns, df.iter_columns(), strict=True):
+        logical_type = _infer_logical_type(series.dtype)
+        values, raw_scalars = _normalized_values(series, logical_type, name)
+        columns.append((name, logical_type, values, raw_scalars))
+    return columns
 
 
 def _infer_logical_type(dtype: Any) -> str:
@@ -57,9 +59,26 @@ def _infer_logical_type(dtype: Any) -> str:
     raise TypeError(f"Column has unsupported Polars dtype '{dtype}'")
 
 
-def _normalized_values(series: Any, column_name: str):
-    logical_type = _infer_logical_type(series.dtype)
-    return (_normalize_value(value, logical_type, column_name) for value in series)
+def _normalized_values(series: Any, logical_type: str, column_name: str) -> tuple[object, bool]:
+    """Use the existing typed PyO3 scalar path where null handling is identical.
+
+    This is not zero-copy: Rust still owns its final ``Vec<ProfileValue>``.
+    It avoids the Python generator and normalizer call per value for contiguous
+    non-null signed integer, float, and Boolean series. UInt64 deliberately
+    remains on the checked fallback so its i64 overflow message is preserved.
+    """
+    import polars as pl
+
+    if series.null_count() == 0 and (
+        logical_type == "float"
+        or logical_type == "boolean"
+        or (logical_type == "integer" and series.dtype != pl.UInt64)
+    ):
+        return series, True
+    return (
+        (_normalize_value(value, logical_type, column_name) for value in series),
+        False,
+    )
 
 
 def _normalize_value(value: Any, logical_type: str, column_name: str) -> object:

@@ -4,6 +4,11 @@
 
 ### Changed
 
+- v0.4.5 adds local-only large-data benchmark guardrails and memory metadata,
+  including available physical memory and peak delta above the loaded frame.
+- v0.4.4 sends safe non-null Polars numeric and Boolean series through the
+  existing raw typed PyO3 path, avoiding its per-value Python normalizer while
+  retaining checked fallback semantics for every other dtype.
 - v0.4.3 adds an optional direct Polars DataFrame backend through private
   normalization, including mixed pandas/Polars compare and schema drift.
 - v0.4.2-E completes the hardening audit and reruns the local final benchmark

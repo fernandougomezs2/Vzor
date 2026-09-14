@@ -26,6 +26,14 @@ Vzor supports pandas by default and an optional direct Polars backend. Install
 it with `pip install "vzor[polars]"`; no pandas conversion is required for a
 `polars.DataFrame`. LazyFrame is intentionally unsupported.
 
+The adapters preserve the same factual models across supported backends. Their
+current numeric fast paths still build owned Rust values; they do not claim
+zero-copy buffer transport.
+
+Performance claims are meaningful only with a documented backend, dataset
+profile, operation, hardware and memory context. Large-data stress evidence is
+not a universal row-count support guarantee.
+
 ## What Vzor Does
 
 - Profiles pandas DataFrames.

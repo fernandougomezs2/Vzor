@@ -84,7 +84,8 @@ def process_memory() -> dict[str, int | str | None]:
     }
 
 
-def _total_ram_bytes() -> int | None:
+def memory_status() -> tuple[int | None, int | None]:
+    """Return total and currently available physical memory for benchmark policy."""
     if os.name == "nt":
         class MEMORYSTATUSEX(ctypes.Structure):
             _fields_ = [
@@ -102,14 +103,14 @@ def _total_ram_bytes() -> int | None:
         status = MEMORYSTATUSEX()
         status.dwLength = ctypes.sizeof(status)
         if ctypes.WinDLL("kernel32").GlobalMemoryStatusEx(ctypes.byref(status)):
-            return int(status.ullTotalPhys)
-        return None
+            return int(status.ullTotalPhys), int(status.ullAvailPhys)
+        return None, None
     try:
         page_size = os.sysconf("SC_PAGE_SIZE")
         page_count = os.sysconf("SC_PHYS_PAGES")
-        return int(page_size * page_count)
+        return int(page_size * page_count), None
     except (AttributeError, OSError, ValueError):
-        return None
+        return None, None
 
 
 def _cpu_model() -> str | None:
@@ -138,7 +139,7 @@ def system_metadata(
     import vzor
 
     dataset_size = dataset_path.stat().st_size
-    total_ram = _total_ram_bytes()
+    total_ram, available_ram = memory_status()
     resolved_dataset = Path(dataset_path).resolve()
     dataset_drive = resolved_dataset.drive or None
     try:
@@ -158,6 +159,8 @@ def system_metadata(
         "logical_cpu_count": os.cpu_count(),
         "total_ram_bytes": total_ram,
         "total_ram_gb": round(total_ram / 1024**3, 3) if total_ram is not None else None,
+        "available_ram_bytes": available_ram,
+        "available_ram_gb": round(available_ram / 1024**3, 3) if available_ram is not None else None,
         "operation": operation,
         "profile": profile,
         "seed": seed,
