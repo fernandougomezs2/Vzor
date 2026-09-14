@@ -17,7 +17,9 @@ normalización escalar redundante de Polars en una ruta typed segura, sin
 reclamar zero-copy ni cambiar semánticas. Estas subfases no modifican el runtime
 público ni implican soporte general para datasets de 5M filas. v0.4.5 añadió
 guardrails de benchmark y evidencia progresiva para datos grandes; los límites
-dependen del perfil, backend y hardware, sin afirmar soporte 5M universal. Los reportes
+dependen del perfil, backend y hardware, sin afirmar soporte 5M universal. v0.4.6
+formaliza la compatibilidad CPython 3.12/3.13 para Windows y Linux x86-64,
+pandas y Polars opcional, junto con CI y wheels sin publicación automática. Los reportes
 mantienen todos sus datos y HTML completo, mientras que su `repr` de alto nivel
 presenta summaries y previews estructurales acotados. El paquete es `0.3.2`.
 

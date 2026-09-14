@@ -1,0 +1,39 @@
+name: Wheels
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: wheel (${{ matrix.os }}, CPython ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -i python
+          manylinux: 2014
+      - run: python -m venv wheel-smoke
+      - shell: bash
+        run: wheel-smoke/bin/python -m pip install --upgrade pip && wheel-smoke/bin/python -m pip install dist/*.whl && wheel-smoke/bin/python -c "import pandas as pd, vzor; assert vzor.profile(pd.DataFrame({'id':[1]})).row_count == 1"
+        if: runner.os != 'Windows'
+      - shell: pwsh
+        run: wheel-smoke\Scripts\python.exe -m pip install --upgrade pip; wheel-smoke\Scripts\python.exe -m pip install dist\*.whl; wheel-smoke\Scripts\python.exe -c "import pandas as pd, vzor; assert vzor.profile(pd.DataFrame({'id':[1]})).row_count == 1"
+        if: runner.os == 'Windows'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-cp${{ matrix.python }}
+          path: dist/*.whl

@@ -98,6 +98,29 @@ Mixed pandas/Polars `compare` and `schema_drift` are supported through the
 same private normalized input. Suggested Schema remains a proposal, not a Data
 Contract; transformations remain pandas/Polars responsibilities.
 
+## Compatibility and Distribution
+
+The pending compatibility matrix is CPython 3.12 and 3.13 on Windows and Linux
+x86-64. Package metadata requires `Python >=3.12,<3.14`,
+`pandas>=2.2.3,<4`, and the optional `polars>=1.0,<2` extra. Python 3.14 is not
+part of the support claim until it has explicit compatibility evidence.
+
+`.github/workflows/ci.yml` runs core tests on both operating systems and Python
+versions, plus pandas and Polars minimum/current compatibility lanes.
+`.github/workflows/wheels.yml` builds version-specific Windows/Linux wheels,
+performs fresh-install smoke tests, and uploads artifacts only. It must not
+publish packages, tags, releases, or alter Git history. Keep wheel builds
+version-specific unless an ABI3 configuration has been explicitly designed and
+validated for every supported interpreter.
+
+Do not claim the pending matrix as supported until the corresponding remote CI
+lanes, wheels, and fresh-install tests are green.
+
+When changing compatibility metadata, retain direct tests of paths with spaces
+and Unicode through the CLI, persistence, and standalone HTML export. Do not
+introduce pandas or Polars private-API dependencies; compatibility must rest on
+their documented public surfaces.
+
 The current fast paths use direct scalar transport only for safe non-null
 numeric/Boolean columns. Rust owns final values; no adapter claims zero-copy,
 borrowed buffers, Arrow transport, or global thread configuration.

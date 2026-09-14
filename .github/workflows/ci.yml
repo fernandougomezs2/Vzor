@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: core (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m pip install --upgrade pip pytest maturin
+      - run: maturin develop --release --locked
+      - run: cargo check --locked
+      - run: cargo test --locked
+      - run: python -m pytest -q
+      - run: python -W error::DeprecationWarning -m pytest -q tests/test_compatibility_paths.py
+      - run: python -c "import pandas, vzor; assert vzor.__version__ == vzor.version() == '0.3.2'; print(pandas.__version__)"
+      - run: vzor version
+
+  pandas-compatibility:
+    name: pandas ${{ matrix.pandas }} (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+        pandas: ["2.2.3", "3.0.5"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m pip install --upgrade pip pytest maturin "pandas==${{ matrix.pandas }}"
+      - run: maturin develop --release --locked
+      - run: python -m pytest -q
+      - run: python -c "import pandas, vzor; print('pandas', pandas.__version__, 'vzor', vzor.__version__)"
+
+  polars-compatibility:
+    name: Polars ${{ matrix.polars }} (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+        polars: ["1.0.0", "latest"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m pip install --upgrade pip pytest maturin
+      - if: matrix.polars != 'latest'
+        run: python -m pip install "polars==${{ matrix.polars }}"
+      - if: matrix.polars == 'latest'
+        run: python -m pip install "polars>=1.0,<2"
+      - run: maturin develop --release --locked
+      - run: python -m pytest -q tests/test_polars_backend.py tests/test_cross_backend_buffers.py
+      - run: python -c "import pandas as pd, polars as pl, vzor; p=pd.DataFrame({'id':[1,2]}); q=pl.DataFrame({'id':[1,2]}); assert not vzor.compare(p,q).has_changes; assert not vzor.schema_drift(q,p).has_drift; assert vzor.validate(q,vzor.suggest_schema(p)).is_valid"
+
+  fresh-install-no-polars:
+    name: fresh wheel install without Polars
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -i python
+          manylinux: 2014
+      - run: python -m venv fresh-venv
+      - run: fresh-venv/bin/python -m pip install --upgrade pip
+      - run: fresh-venv/bin/python -m pip install dist/*.whl
+      - run: fresh-venv/bin/python -c "import pandas as pd, vzor; assert vzor.profile(pd.DataFrame({'id':[1]})).row_count == 1"
+      - run: fresh-venv/bin/python -c "import importlib.util; assert importlib.util.find_spec('polars') is None"
+
+  fresh-install-polars:
+    name: fresh wheel install with Polars
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -i python
+          manylinux: 2014
+      - run: python -m venv fresh-polars-venv
+      - run: fresh-polars-venv/bin/python -m pip install --upgrade pip
+      - run: fresh-polars-venv/bin/python -m pip install "vzor[polars] @ file://$GITHUB_WORKSPACE/$(basename $(find dist -name '*.whl' -print -quit))"
+      - run: fresh-polars-venv/bin/python -c "import pandas as pd, polars as pl, vzor; p=pd.DataFrame({'id':[1,2]}); q=pl.DataFrame({'id':[1,2]}); assert vzor.inspect(q).row_count == 2; assert vzor.validate(q,vzor.suggest_schema(p)).is_valid; assert not vzor.compare(p,q).has_changes; assert not vzor.schema_drift(q,p).has_drift"

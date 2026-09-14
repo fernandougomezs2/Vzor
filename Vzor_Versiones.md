@@ -252,6 +252,16 @@ decidir escalado progresivo. En el hardware documentado se stress-testearon
 baseline Polars hasta 2M filas; 3M y 5M quedaron bloqueados por seguridad, no
 como una afirmación de soporte. Detalles: `docs/v0.4.5-large-data-hardening.md`.
 
+## v0.4.6 — Compatibility, CI & Wheels — READY FOR REMOTE CI
+
+La subfase formaliza el soporte de CPython 3.12 y 3.13 para Windows y Linux
+x86-64, con pandas por defecto y Polars opcional. Incluye rangos de dependencias
+conservadores, matriz CI para versiones mínima y actual de ambos backends,
+builds de wheels por intérprete y smoke tests de instalación limpia. No publica
+artefactos ni modifica la API, semánticas, runtime, formatos o versión del
+paquete. La validación local Windows/CPython 3.12 está documentada; el cierre
+requiere que la matriz remota CI se ejecute en GitHub.
+
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.
 

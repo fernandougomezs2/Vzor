@@ -15,16 +15,17 @@ def normalize_dataframe(df: Any) -> list[NormalizedColumn]:
         return _normalize_pandas(df)
 
     try:
-        from ._polars_adapter import (
-            is_polars_dataframe,
-            is_polars_lazyframe,
-            normalize_polars_dataframe,
-        )
+        import polars  # noqa: F401
     except ModuleNotFoundError as error:
         if error.name != "polars":
             raise
-        is_polars_dataframe = lambda value: False
-        is_polars_lazyframe = lambda value: False
+        raise TypeError("Vzor expects a pandas.DataFrame or polars.DataFrame") from None
+
+    from ._polars_adapter import (
+        is_polars_dataframe,
+        is_polars_lazyframe,
+        normalize_polars_dataframe,
+    )
 
     if is_polars_dataframe(df):
         return normalize_polars_dataframe(df)

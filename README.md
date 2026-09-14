@@ -20,6 +20,20 @@ Vzor profiles datasets, observes their structure, suggests conservative schemas,
 validates later inputs, compares snapshots, and detects structural schema drift.
 Its results are deterministic and local-first.
 
+## Compatibility target (pending remote CI)
+
+Vzor's compatibility target is CPython 3.12 and 3.13 on 64-bit Windows and
+Linux. The default backend is `pandas>=2.2.3,<4`; Polars is optional through
+`pip install "vzor[polars]"` with `polars>=1.0,<2`.
+
+The repository CI exercises the minimum and current supported pandas and
+Polars releases for both Python versions. It builds CPython-version-specific
+wheels for Windows and Linux x86-64, smoke-tests fresh installs, and publishes
+the wheels only as workflow artifacts. This repository does not publish to
+PyPI from CI. The Windows/CPython 3.12 evidence is local; Python 3.13 and Linux
+become supported only after the corresponding remote CI lanes pass. Python 3.14
+is intentionally outside the tested support matrix.
+
 ## DataFrame backends
 
 Vzor supports pandas by default and an optional direct Polars backend. Install
@@ -55,8 +69,10 @@ Polars, or SQL for those responsibilities.
 Vzor is documented here as a local/source installation; this repository does
 not claim a published PyPI package.
 
-The verified development environment is Windows with Python 3.12 and a Rust
-toolchain available to build the PyO3 extension.
+The local development baseline is Windows with Python 3.12 and a Rust toolchain
+available to build the PyO3 extension. See
+[the compatibility and wheel notes](docs/v0.4.6-compatibility-ci-wheels.md)
+for the complete platform matrix and validation status.
 
 ```powershell
 python -m venv .venv
