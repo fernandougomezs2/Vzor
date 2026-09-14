@@ -214,7 +214,7 @@ fn dataset_input_from_python(py: Python<'_>, columns: Vec<PythonColumn>) -> PyRe
             let (name, logical_type, values, raw_scalars) =
                 normalized_column_from_python(py, column)?;
             let logical_type = parse_logical_type(&logical_type)?;
-            let values = PyIterator::from_object(&values.bind(py))?
+            let values = PyIterator::from_object(values.bind(py))?
                 .map(|value| {
                     value.and_then(|value| {
                         if raw_scalars {

@@ -214,4 +214,4 @@ def test_existing_public_api_and_version_remain_available() -> None:
     assert vzor.observed_schema(df).column("x").logical_type == "integer"
     assert vzor.suggest_schema(df).column("x").logical_type == "integer"
     assert vzor.inspect(df).profile.column("x").logical_type == "integer"
-    assert vzor.version() == "0.3.2"
+    assert vzor.version() == "0.4.0"

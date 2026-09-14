@@ -4,7 +4,7 @@
 > backends; no pretende reemplazarlos ni convertirse en un motor general de
 > ingesta.
 
-Estado actual: **Vzor v0.3.2 — Compact Report Repr — COMPLETE**. La subfase
+Estado actual: **Vzor 0.4.0 — Hardening, compatibility and release readiness — REMOTE GATE PENDING**. La subfase
 v0.4.1 cerró la infraestructura de benchmarks locales y el inventario de
 memoria. v0.4.2-A cerró la eliminación de clones internos redundantes de
 `DatasetInput`. v0.4.2-B cerró la reducción de materialización transitoria en
@@ -22,7 +22,11 @@ formaliza y valida la compatibilidad CPython 3.12/3.13 para Windows y Linux
 x86-64, pandas y Polars opcional, junto con CI y wheels sin publicación
 automática. Los reportes
 mantienen todos sus datos y HTML completo, mientras que su `repr` de alto nivel
-presenta summaries y previews estructurales acotados. El paquete es `0.3.2`.
+presenta summaries y previews estructurales acotados. El paquete es `0.4.0`.
+
+v0.4.7 cerró el hardening final con targets Rust de propiedades de semilla fija,
+regresiones de bordes públicos y documentación de release. No cambió la API,
+las semánticas, los formatos externos ni las responsabilidades de Vzor.
 
 ## Contrato real de la API Python
 

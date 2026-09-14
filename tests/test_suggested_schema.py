@@ -253,7 +253,7 @@ def test_profile_observed_and_suggested_are_consistent_for_mixed_dataframe() -> 
 def test_public_models_and_existing_api_remain_available() -> None:
     assert callable(vzor.suggest_schema)
     assert vzor.SuggestedNumericRange(min=0.0, max=None).max is None
-    assert vzor.version() == "0.3.2"
+    assert vzor.version() == "0.4.0"
     df = pd.DataFrame({"x": [1, 2, 3]})
     assert vzor.profile(df).column("x").logical_type == "integer"
     assert vzor.observed_schema(df).column("x").logical_type == "integer"

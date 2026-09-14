@@ -312,6 +312,11 @@ code, verify its license, prefer MIT or MIT/Apache-2.0, preserve user-level
 installation, and keep the core usable offline. Do not claim a license for an
 existing dependency without checking it.
 
+`proptest` is a pinned MIT/Apache-2.0 development-only dependency for the
+fixed-seed Rust hardening targets. It must not become a runtime, wheel, or
+public API dependency. Keep those targets pure Rust: no PyO3, Python,
+filesystem, or network invocation.
+
 ## Testing Rules
 
 Run:
@@ -322,6 +327,11 @@ cargo check --locked
 cargo test --locked
 pytest -q
 ```
+
+For release hardening, also run `cargo clippy --all-targets --locked -- -D
+warnings` and the fixed-seed targets through `cargo test --locked
+hardening_tests`. The release checklist records the required remote matrix;
+never mark it green without exact-commit GitHub Actions evidence.
 
 At the start of v0.3.5, the baseline was 131 Rust tests and 250 Python tests.
 These counts are not permanent. Do not reduce behavioral coverage; add

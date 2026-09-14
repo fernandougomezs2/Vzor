@@ -12,7 +12,7 @@ de pandas ni un motor general de ingesta.
 v0.1 — Core                                      COMPLETE
 v0.2 — Validación, drift y uso operativo         COMPLETE
 v0.3 — Madurez, reporting y UX avanzada          COMPLETE
-v0.4 — Hardening, performance y backends         IN DEVELOPMENT
+v0.4 — Hardening, performance y backends         RELEASE CANDIDATE
 v0.5 — Excel / Power BI exports                   PLANNED
 ```
 
@@ -90,7 +90,7 @@ un resumen; las reglas de negocio se mantienen en Rust.
 ## Contratos de versión independientes
 
 ```text
-Package version:             0.3.2
+Package version:             0.4.0
 Persistence format_version:  1
 Agent output_version:         1
 ```
@@ -262,6 +262,15 @@ remota pasó en Windows/Linux x86-64 y CPython 3.12/3.13, incluidos pandas y
 Polars mínimo/actual, backends mixtos, instalaciones limpias y cuatro wheels.
 No publica artefactos, ni modifica API, semánticas, runtime, formatos o versión
 del paquete.
+
+## v0.4.7 — Fuzzing, Documentation & Release Hardening — PENDING REMOTE GATE
+
+La subfase final de v0.4 agrega targets Rust de propiedades con semilla fija,
+regresiones públicas de bordes y documentación de release. Mantiene API,
+semánticas, CLI, HTML, persistencia, `output_version = 1` y
+`format_version = 1`; no añade Hypothesis, cargo-fuzz, nightly ni dependencias
+runtime. La evidencia y los límites de release están en
+`docs/v0.4.7-hardening.md` y `docs/release-checklist-v0.4.0.md`.
 
 Objetivo: robustecer y medir el motor para datasets mayores y backends
 adicionales.

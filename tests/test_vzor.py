@@ -6,5 +6,5 @@ def test_vzor_imports():
 
 
 def test_version_comes_from_rust_core():
-    assert vzor.version() == "0.3.2"
+    assert vzor.version() == "0.4.0"
     assert vzor.__version__ == vzor.version()

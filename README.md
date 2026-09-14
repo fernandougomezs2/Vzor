@@ -9,9 +9,9 @@ Vzor complements pandas and Polars. It does not replace them.
 
 > Detect before correcting. Observe before restricting. Validate before trusting.
 
-Vzor is under active development. Version `0.3.2` adds compact structural
-plain-text report representations while preserving complete standalone HTML,
-analytics, and CLI contracts.
+Vzor 0.4.0 is a release candidate for the existing API: it preserves the
+compact structural plain-text reports, complete standalone HTML, analytics,
+and CLI contracts while adding reproducible core property coverage.
 
 ## Why Vzor
 
@@ -72,7 +72,8 @@ not claim a published PyPI package.
 The local development baseline is Windows with Python 3.12 and a Rust toolchain
 available to build the PyO3 extension. See
 [the compatibility and wheel notes](docs/v0.4.6-compatibility-ci-wheels.md)
-for the complete platform matrix and validation status.
+and the [v0.4.0 release checklist](docs/release-checklist-v0.4.0.md) for the
+complete platform matrix and validation status.
 
 ```powershell
 python -m venv .venv
@@ -233,6 +234,8 @@ Power BI present results.
 - [Professional Workflows](docs/professional-workflows.md)
 - [Agent Guide](AGENTS.md)
 - [Changelog](CHANGELOG.md)
+- [v0.4.0 Release Checklist](docs/release-checklist-v0.4.0.md)
+- [v0.4.0 Release Notes](docs/release-notes-v0.4.0.md)
 
 ## AI / Agent Usage
 

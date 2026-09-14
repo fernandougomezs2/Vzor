@@ -1,6 +1,6 @@
 [package]
 name = "vzor-core"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2021"
 license = "MIT"
 description = "Rust core for the vzor Python library"
@@ -13,3 +13,8 @@ crate-type = ["cdylib"]
 pyo3 = { version = "0.23", features = ["extension-module"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+[dev-dependencies]
+# Property-based hardening for the Rust core. This is test-only and is never
+# linked into the Python extension or published wheel.
+proptest = "=1.11.0"

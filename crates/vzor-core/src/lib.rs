@@ -6,6 +6,9 @@ pub mod schema;
 pub mod schema_drift;
 pub mod validation;
 
+#[cfg(test)]
+mod hardening_tests;
+
 use pyo3::prelude::*;
 
 #[pyfunction]

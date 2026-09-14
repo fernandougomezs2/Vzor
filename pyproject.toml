@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "vzor"
-version = "0.3.2"
+version = "0.4.0"
 description = "Rust-powered data quality library for Python"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"

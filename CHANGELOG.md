@@ -1,9 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
 ### Changed
 
+- v0.4.7 adds fixed-seed Rust property-based hardening targets and public edge
+  regressions for extreme numeric inputs, HTML escaping, malformed persistence,
+  CLI errors, and deterministic mixed-type reports. It also removes a Clippy
+  redundant PyO3 borrow without changing behavior. The test-only `proptest`
+  dependency is not linked into the extension or published wheels.
 - v0.4.6 formalizes the CPython 3.12/3.13, Windows/Linux x86-64, pandas, and
   optional Polars compatibility policy in package metadata and documentation.
   It adds non-publishing CI and wheel workflows, fresh-install smoke coverage,
