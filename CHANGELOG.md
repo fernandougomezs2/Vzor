@@ -9,7 +9,9 @@
   It adds non-publishing CI and wheel workflows, fresh-install smoke coverage,
   and path/CLI/HTML/persistence compatibility regression coverage. Base-only
   installs now preserve the existing `TypeError` contract for unsupported
-  inputs when the optional Polars package is absent.
+  inputs when the optional Polars package is absent. The final remote matrix
+  passed on Windows/Linux and CPython 3.12/3.13, including pandas and Polars
+  minimum/current lanes, fresh installs, and binary wheel smoke tests.
 - v0.4.5 adds local-only large-data benchmark guardrails and memory metadata,
   including available physical memory and peak delta above the loaded frame.
 - v0.4.4 sends safe non-null Polars numeric and Boolean series through the

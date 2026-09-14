@@ -100,8 +100,8 @@ Contract; transformations remain pandas/Polars responsibilities.
 
 ## Compatibility and Distribution
 
-The pending compatibility matrix is CPython 3.12 and 3.13 on Windows and Linux
-x86-64. Package metadata requires `Python >=3.12,<3.14`,
+The supported compatibility matrix is CPython 3.12 and 3.13 on Windows and
+Linux x86-64. Package metadata requires `Python >=3.12,<3.14`,
 `pandas>=2.2.3,<4`, and the optional `polars>=1.0,<2` extra. Python 3.14 is not
 part of the support claim until it has explicit compatibility evidence.
 
@@ -113,7 +113,7 @@ publish packages, tags, releases, or alter Git history. Keep wheel builds
 version-specific unless an ABI3 configuration has been explicitly designed and
 validated for every supported interpreter.
 
-Do not claim the pending matrix as supported until the corresponding remote CI
+Do not claim any new matrix as supported until its corresponding remote CI
 lanes, wheels, and fresh-install tests are green.
 
 When changing compatibility metadata, retain direct tests of paths with spaces
