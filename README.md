@@ -30,9 +30,9 @@ The repository CI exercises the minimum and current supported pandas and
 Polars releases for both Python versions. It builds CPython-version-specific
 wheels for Windows and Linux x86-64, smoke-tests fresh installs, and publishes
 the wheels only as workflow artifacts. This repository does not publish to
-PyPI from CI. The Windows/CPython 3.12 evidence is local; Python 3.13 and Linux
-are validated by the same remote CI lanes. Python 3.14 is intentionally outside
-the tested support matrix.
+PyPI from CI. The v0.4.0 remote gate passed across the complete matrix; exact
+job, wheel, and artifact evidence is in the release checklist. Python 3.14 is
+intentionally outside the tested support matrix.
 
 ## DataFrame backends
 

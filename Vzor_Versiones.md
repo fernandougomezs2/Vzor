@@ -12,7 +12,7 @@ de pandas ni un motor general de ingesta.
 v0.1 — Core                                      COMPLETE
 v0.2 — Validación, drift y uso operativo         COMPLETE
 v0.3 — Madurez, reporting y UX avanzada          COMPLETE
-v0.4 — Hardening, performance y backends         RELEASE CANDIDATE
+v0.4 — Hardening, performance y backends         COMPLETE
 v0.5 — Excel / Power BI exports                   PLANNED
 ```
 
@@ -263,7 +263,7 @@ Polars mínimo/actual, backends mixtos, instalaciones limpias y cuatro wheels.
 No publica artefactos, ni modifica API, semánticas, runtime, formatos o versión
 del paquete.
 
-## v0.4.7 — Fuzzing, Documentation & Release Hardening — PENDING REMOTE GATE
+## v0.4.7 — Fuzzing, Documentation & Release Hardening — COMPLETE
 
 La subfase final de v0.4 agrega targets Rust de propiedades con semilla fija,
 regresiones públicas de bordes y documentación de release. Mantiene API,

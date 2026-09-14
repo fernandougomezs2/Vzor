@@ -27,17 +27,30 @@
 
 ## Remote compatibility and wheel gate
 
-- [ ] Windows x86-64 / CPython 3.12 core and wheel smoke.
-- [ ] Windows x86-64 / CPython 3.13 core and wheel smoke.
-- [ ] Linux x86-64 / CPython 3.12 core and wheel smoke.
-- [ ] Linux x86-64 / CPython 3.13 core and wheel smoke.
-- [ ] pandas minimum/current, Polars minimum/current, mixed backend and fresh
+- [x] Windows x86-64 / CPython 3.12 core and wheel smoke.
+- [x] Windows x86-64 / CPython 3.13 core and wheel smoke.
+- [x] Linux x86-64 / CPython 3.12 core and wheel smoke.
+- [x] Linux x86-64 / CPython 3.13 core and wheel smoke.
+- [x] pandas minimum/current, Polars minimum/current, mixed backend and fresh
   wheel installs with and without Polars.
-- [ ] Download and inspect all four remote wheels; perform their clean-venv
+- [x] Download and inspect all four remote wheels; perform their clean-venv
   smoke profiles.
 
-The remaining boxes are an external gate, not a known code failure. They are
-completed only with successful GitHub Actions evidence for this exact commit.
+The exact-commit remote gate completed successfully: [CI run 34892189850](https://github.com/fernandougomezs2/Vzor/actions/runs/34892189850)
+passed 14/14 jobs, and [Wheels run 34892228846](https://github.com/fernandougomezs2/Vzor/actions/runs/34892228846)
+passed 4/4. CI covers Windows/Linux x86-64 with CPython 3.12/3.13, pandas
+2.2.3 and 3.0.5, Polars 1.0.0 and latest `<2`, mixed backend, and fresh
+installs with and without Polars.
+
+| Platform | Wheel | Wheel bytes | Artifact bytes | Clean-venv smoke |
+| --- | --- | ---: | ---: | --- |
+| Linux x86-64 / 3.12 | `vzor-0.4.0-cp312-cp312-manylinux_2_28_x86_64.whl` | 433,100 | 431,036 | passed |
+| Linux x86-64 / 3.13 | `vzor-0.4.0-cp313-cp313-manylinux_2_28_x86_64.whl` | 432,675 | 430,651 | passed |
+| Windows x86-64 / 3.12 | `vzor-0.4.0-cp312-cp312-win_amd64.whl` | 282,764 | 280,855 | passed |
+| Windows x86-64 / 3.13 | `vzor-0.4.0-cp313-cp313-win_amd64.whl` | 282,284 | 280,355 | passed |
+
+Each downloaded artifact contained one 24-entry wheel. Inspection found no
+build target, virtual environment, cache, benchmark, or dataset entries.
 
 ## Publication guard
 

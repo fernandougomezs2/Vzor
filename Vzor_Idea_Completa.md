@@ -4,7 +4,7 @@
 > backends; no pretende reemplazarlos ni convertirse en un motor general de
 > ingesta.
 
-Estado actual: **Vzor 0.4.0 — Hardening, compatibility and release readiness — REMOTE GATE PENDING**. La subfase
+Estado actual: **Vzor 0.4.0 — Hardening, compatibility and release readiness — COMPLETE**. La subfase
 v0.4.1 cerró la infraestructura de benchmarks locales y el inventario de
 memoria. v0.4.2-A cerró la eliminación de clones internos redundantes de
 `DatasetInput`. v0.4.2-B cerró la reducción de materialización transitoria en

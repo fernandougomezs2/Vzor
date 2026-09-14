@@ -32,4 +32,6 @@ exports, data contracts, join analysis, a Git tag, a GitHub Release, or PyPI
 publication. Those require separate scope and evidence.
 
 The completed CI run identifiers, exact wheel tags, and artifact validation are
-added to the checklist after the remote release gate succeeds.
+recorded in the [v0.4.0 release checklist](release-checklist-v0.4.0.md): CI
+run 34892189850 passed 14/14 and Wheels run 34892228846 passed 4/4. All four
+downloaded artifacts were inspected and their clean-venv smoke profiles passed.
