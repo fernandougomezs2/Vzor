@@ -22,6 +22,12 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - uses: dtolnay/rust-toolchain@stable
+      - name: Create development virtual environment
+        shell: pwsh
+        run: |
+          python -m venv .venv
+          $vzorBin = if ($env:RUNNER_OS -eq 'Windows') { Join-Path $PWD '.venv\Scripts' } else { Join-Path $PWD '.venv/bin' }
+          $vzorBin | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
       - run: python -m pip install --upgrade pip pytest maturin
       - run: maturin develop --release --locked
       - run: cargo check --locked
@@ -45,6 +51,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - uses: dtolnay/rust-toolchain@stable
+      - name: Create development virtual environment
+        run: python -m venv .venv
+      - run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
       - run: python -m pip install --upgrade pip pytest maturin "pandas==${{ matrix.pandas }}"
       - run: maturin develop --release --locked
       - run: python -m pytest -q
@@ -64,6 +73,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - uses: dtolnay/rust-toolchain@stable
+      - name: Create development virtual environment
+        run: python -m venv .venv
+      - run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
       - run: python -m pip install --upgrade pip pytest maturin
       - if: matrix.polars != 'latest'
         run: python -m pip install "polars==${{ matrix.polars }}"
@@ -84,8 +96,8 @@ jobs:
       - uses: PyO3/maturin-action@v1
         with:
           command: build
-          args: --release --out dist -i python
-          manylinux: 2014
+          args: --release --out dist -i python3.12
+          manylinux: 2_28
       - run: python -m venv fresh-venv
       - run: fresh-venv/bin/python -m pip install --upgrade pip
       - run: fresh-venv/bin/python -m pip install dist/*.whl
@@ -103,8 +115,8 @@ jobs:
       - uses: PyO3/maturin-action@v1
         with:
           command: build
-          args: --release --out dist -i python
-          manylinux: 2014
+          args: --release --out dist -i python3.12
+          manylinux: 2_28
       - run: python -m venv fresh-polars-venv
       - run: fresh-polars-venv/bin/python -m pip install --upgrade pip
       - run: fresh-polars-venv/bin/python -m pip install "vzor[polars] @ file://$GITHUB_WORKSPACE/$(basename $(find dist -name '*.whl' -print -quit))"

@@ -21,11 +21,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - uses: PyO3/maturin-action@v1
+      - if: runner.os == 'Linux'
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -i python${{ matrix.python }}
+          manylinux: 2_28
+      - if: runner.os == 'Windows'
+        uses: PyO3/maturin-action@v1
         with:
           command: build
           args: --release --out dist -i python
-          manylinux: 2014
       - run: python -m venv wheel-smoke
       - shell: bash
         run: wheel-smoke/bin/python -m pip install --upgrade pip && wheel-smoke/bin/python -m pip install dist/*.whl && wheel-smoke/bin/python -c "import pandas as pd, vzor; assert vzor.profile(pd.DataFrame({'id':[1]})).row_count == 1"
