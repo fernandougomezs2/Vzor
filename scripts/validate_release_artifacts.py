@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sys
-import tomllib
 from email.parser import BytesParser
 from pathlib import Path
 from zipfile import ZipFile
@@ -15,9 +14,9 @@ def main() -> int:
 
     dist_directory = Path(sys.argv[1])
     tag = sys.argv[2]
-    package_version = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-    if tag != f"v{package_version}":
-        raise SystemExit(f"Tag {tag!r} does not match package version {package_version!r}.")
+    if not tag.startswith("v") or len(tag) == 1:
+        raise SystemExit(f"Release tag {tag!r} must begin with 'v' and include a version.")
+    package_version = tag[1:]
 
     expected = {
         f"vzor-{package_version}-cp312-cp312-win_amd64.whl",
