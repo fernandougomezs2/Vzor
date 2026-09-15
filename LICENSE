@@ -1,21 +1,107 @@
-MIT License
+Vzor Community and SaaS License 1.0
 
 Copyright (c) 2026 Vzor contributors
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Definitions
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+"Vzor" means the software and associated documentation distributed under this
+license. "Licensor" means the copyright holder or holders granting this
+license. "You" means an individual or legal entity exercising permissions
+under this license.
+
+"Commercial SaaS Product" means a specific product that: (a) incorporates,
+integrates, or uses Vzor; (b) is offered to customers or users as hosted
+software or a network-accessible service for commercial purposes; and (c) has
+generated more than USD 5,000 in Cumulative Gross Revenue. Hosted commercial
+APIs offered as a service may be Commercial SaaS Products. Internal company
+APIs are not Commercial SaaS Products for this purpose.
+
+"Cumulative Gross Revenue" means the gross revenue accumulated by the specific
+Commercial SaaS Product that uses Vzor, before salaries, infrastructure,
+hosting, taxes, commissions, marketing, or other operating costs. It excludes
+revenue from other products, general company revenue, SaaS products that do not
+use Vzor, unrelated consulting, and other lines of business. The threshold is
+evaluated separately for each SaaS product.
+
+2. License Grant
+
+Subject to this license, the Licensor grants You a worldwide, royalty-free,
+non-exclusive license to use, study, copy, modify, distribute, and fork Vzor,
+including in personal, educational, research, data-science, analytics,
+consulting, nonprofit, organizational, internal business, internal API,
+desktop, on-premise, and commercial software use.
+
+Vzor is free to use in a Commercial SaaS Product while its Cumulative Gross
+Revenue is USD 5,000 or less. Normal updates, new features, front-end changes,
+and infrastructure changes do not make a substantially same commercial product
+a new SaaS product solely for this license.
+
+3. Commercial SaaS License Requirement
+
+When a Commercial SaaS Product exceeds USD 5,000 in Cumulative Gross Revenue,
+a 30-calendar-day grace period begins. You may continue to use Vzor in that
+product during the grace period. Before it ends, You must obtain a commercial
+license for that product.
+
+The commercial license fee is USD 149 per year for each Commercial SaaS
+Product. It is not per company, user, or server, is not a percentage of
+revenue, and carries no additional royalty or revenue-sharing obligation. A
+commercial license lasts 12 months beginning on its purchase date and is not
+automatically backdated.
+
+If the grace period ends without a valid commercial license, Your permission to
+use Vzor in that Commercial SaaS Product is suspended until You obtain one.
+Your permissions for all other uses under this license remain unaffected.
+
+4. Compliance and Verification
+
+Upon a reasonable written request, an operator subject to the commercial
+license requirement must provide information reasonably sufficient to determine
+whether the applicable Cumulative Gross Revenue threshold has been exceeded.
+Any request must be limited to information reasonably necessary to verify that
+compliance; this section does not grant indiscriminate access to accounting
+books or records.
+
+If Vzor is used in a Commercial SaaS Product without a required commercial
+license, the Licensor may seek the commercial fees that reasonably should have
+been paid for the period of unauthorized use. In the event of intentional
+concealment, misrepresentation, or evasion of the commercial obligation, the
+Licensor may also seek reasonable liquidated damages of up to an additional
+100% of the unpaid fees, subject to applicable law.
+
+5. Redistribution and Modifications
+
+You may redistribute Vzor, modified or unmodified, provided that You retain
+the applicable copyright notice, include this license, do not falsely claim
+original authorship, and do not remove or evade the commercial conditions of
+this license. Modifying, renaming, or forking Vzor does not avoid those
+conditions when the resulting software remains substantially based on Vzor.
+
+6. No Trademark License
+
+This license does not grant permission to use the Vzor name, logo, trademarks,
+or branding, except as necessary to identify the origin of unmodified Vzor or
+as separately authorized by the applicable trademark holder.
+
+7. Separate Agreements
+
+The Licensor may offer enterprise agreements, support, custom contracts, or
+alternative commercial licenses. A separately signed agreement between the
+Licensor and a party prevails over the relevant provisions of this license for
+that party.
+
+8. No Telemetry Requirement
+
+This license imposes no mandatory telemetry, tracking, license calls,
+activation servers, revenue surveillance, or automatic data collection. Its
+commercial terms are based on contractual compliance.
+
+9. Disclaimer of Warranty and Limitation of Liability
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW.

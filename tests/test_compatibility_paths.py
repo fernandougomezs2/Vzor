@@ -65,5 +65,5 @@ def test_html_write_to_read_only_directory_has_a_clear_os_error(tmp_path) -> Non
 
 
 def test_public_version_and_exports_remain_compatibility_surface() -> None:
-    assert vzor.__version__ == vzor.version() == "0.4.0"
+    assert vzor.__version__ == vzor.version() == "0.4.1"
     assert "normalize_dataframe" not in vzor.__all__

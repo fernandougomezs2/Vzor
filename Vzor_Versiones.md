@@ -90,13 +90,21 @@ un resumen; las reglas de negocio se mantienen en Rust.
 ## Contratos de versión independientes
 
 ```text
-Package version:             0.4.0
+Package version:             0.4.1
 Persistence format_version:  1
 Agent output_version:         1
 ```
 
 El número de versión del paquete no modifica automáticamente ninguno de los dos
 formatos externos.
+
+## v0.4.1 — Licencia Vzor Community and SaaS License 1.0
+
+Actualización legal sin cambios de runtime, API, CLI, dependencias ni formatos.
+Vzor pasa de MIT a una licencia source-available: sigue siendo gratuito salvo
+para cada producto SaaS comercial que use Vzor y supere USD 5,000 de ingresos
+brutos acumulados; en ese caso aplica USD 149/año por producto tras 30 días de
+gracia. `output_version = 1` y `format_version = 1` no cambian.
 
 # v0.3 — Madurez, reporting y UX avanzada — COMPLETE
 
@@ -147,7 +155,8 @@ No se modifican runtime, CLI, persistencia ni formatos externos.
 ## v0.3.7 — Hardening final y cierre
 
 **COMPLETE.** Se auditan API, contratos, documentación, determinismo,
-dependencias, empaquetado y casos límite; se incorpora la licencia MIT formal,
+dependencias, empaquetado y casos límite; se incorpora la licencia MIT formal
+(histórica, sustituida posteriormente por Vzor Community and SaaS License 1.0),
 se valida un wheel release desde un entorno limpio y se cierra el paquete como
 `0.3.0`. `output_version = 1` y `format_version = 1` permanecen sin cambios.
 

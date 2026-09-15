@@ -9,9 +9,9 @@ Vzor complements pandas and Polars. It does not replace them.
 
 > Detect before correcting. Observe before restricting. Validate before trusting.
 
-Vzor 0.4.0 is a release candidate for the existing API: it preserves the
+Vzor 0.4.1 is a maintenance release for the existing API. It preserves the
 compact structural plain-text reports, complete standalone HTML, analytics,
-and CLI contracts while adding reproducible core property coverage.
+and CLI contracts while adopting the Vzor Community and SaaS License 1.0.
 
 ## Why Vzor
 
@@ -235,7 +235,7 @@ Power BI present results.
 - [Agent Guide](AGENTS.md)
 - [Changelog](CHANGELOG.md)
 - [v0.4.0 Release Checklist](docs/release-checklist-v0.4.0.md)
-- [v0.4.0 Release Notes](docs/release-notes-v0.4.0.md)
+- [v0.4.1 Release Notes](docs/release-notes-v0.4.1.md)
 
 ## AI / Agent Usage
 
@@ -254,5 +254,12 @@ The roadmap is directional, not current functionality:
 
 ## License
 
-Vzor is available under the [MIT License](LICENSE). The Python and Rust package
-metadata declare the same license.
+Vzor is free to use for almost any purpose under the [Vzor Community and SaaS
+License 1.0](LICENSE). A commercial license is required only when Vzor is used
+in a commercial SaaS product that has generated more than USD 5,000 in
+cumulative gross revenue: USD 149/year per SaaS product, with a 30-day grace
+period after crossing the threshold.
+
+This is a source-available license, not an OSI-approved open-source license.
+See [licensing details](docs/licensing.md); this README is a summary and the
+LICENSE is the governing legal text.

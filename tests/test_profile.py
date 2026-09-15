@@ -167,7 +167,7 @@ def test_invalid_dataframe_shapes_and_inputs_are_rejected():
 
 def test_public_symbols_and_version_remain_available():
     assert callable(vzor.profile)
-    assert vzor.version() == "0.4.0"
+    assert vzor.version() == "0.4.1"
     assert vzor.DatasetProfile is not None
     assert vzor.ColumnProfile is not None
     assert vzor.NumericStats is not None

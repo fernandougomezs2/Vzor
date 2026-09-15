@@ -38,7 +38,7 @@ jobs:
         if: runner.os != 'Windows'
       - shell: pwsh
         run: |
-          $wheel = (Get-ChildItem -LiteralPath dist -Filter 'vzor-0.4.0-*.whl' | Select-Object -First 1).FullName
+          $wheel = (Get-ChildItem -LiteralPath dist -Filter 'vzor-0.4.1-*.whl' | Select-Object -First 1).FullName
           & wheel-smoke\Scripts\python.exe -m pip install --upgrade pip
           & wheel-smoke\Scripts\python.exe -m pip install $wheel
           & wheel-smoke\Scripts\python.exe -c "import pandas as pd, vzor; assert vzor.profile(pd.DataFrame({'id':[1]})).row_count == 1"

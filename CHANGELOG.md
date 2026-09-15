@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.1
+
+### Changed
+
+- Vzor changed from the MIT License to the Vzor Community and SaaS License
+  1.0. Vzor remains free for all uses except a commercial SaaS product that
+  exceeds USD 5,000 in cumulative gross revenue; that product requires a
+  USD 149/year license after a 30-calendar-day grace period. The license
+  requires no telemetry.
+
+### Unchanged
+
+- This release makes no runtime, public API, CLI, dependency,
+  `output_version`, or persistence `format_version` change.
+
 ## 0.4.0
 
 ### Changed
@@ -73,7 +88,8 @@
 - Python reporting API and deterministic human-readable summaries.
 - Convenience properties for reports and existing exact column lookup.
 - `AGENTS.md`, user documentation, and a self-contained workflow example.
-- A formal MIT license.
+- A formal MIT License (the historical license at that release; superseded by
+  the Vzor Community and SaaS License 1.0 in 0.4.0's subsequent legal update).
 
 ### Changed
 

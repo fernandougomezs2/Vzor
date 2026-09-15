@@ -5,6 +5,15 @@
 Vzor is a Python library with a Rust data-quality engine. It adds a local,
 deterministic data trust layer to Python analytics.
 
+## Licensing Status
+
+Vzor uses the Vzor Community and SaaS License 1.0. It is source-available and
+must not be described as MIT, OSI-approved, or open source. Do not modify its
+commercial terms without explicit authorization. Do not add telemetry,
+automatic licensing checks, activation, or revenue tracking. Preserve
+third-party notices and do not assert restrictions that the LICENSE does not
+contain.
+
 Vzor complements pandas and Polars. It does not replace them.
 
 This file is optional repository documentation. Vzor must not read, import, or
@@ -308,7 +317,7 @@ Cargo.toml         Rust workspace
 - Do not change output/persistence versions or package version casually.
 
 Before adding a dependency, demonstrate a real need, prefer stdlib/current
-code, verify its license, prefer MIT or MIT/Apache-2.0, preserve user-level
+code, verify its license, prefer a permissive compatible license, preserve user-level
 installation, and keep the core usable offline. Do not claim a license for an
 existing dependency without checking it.
 
