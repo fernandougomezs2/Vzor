@@ -94,14 +94,14 @@ def test_process_memory_returns_a_documented_metric() -> None:
 def test_system_metadata_contains_dataset_context(tmp_path, monkeypatch) -> None:
     dataset = tmp_path / "datos estrés.csv"
     dataset.write_text("value\n1\n", encoding="utf-8")
-    monkeypatch.setitem(sys.modules, "vzor", SimpleNamespace(__version__="0.4.0"))
+    monkeypatch.setitem(sys.modules, "vzor", SimpleNamespace(__version__="0.4.1"))
     metadata = system_metadata(
         dataset_path=dataset, rows=1, columns=1, operation="inspect", profile="baseline", seed=42
     )
     assert metadata["dataset_name"] == dataset.name
     assert metadata["dataset_file_size_bytes"] == dataset.stat().st_size
     assert metadata["backend"] == "pandas"
-    assert metadata["vzor_version"] == "0.4.0"
+    assert metadata["vzor_version"] == "0.4.1"
     assert "dataset_disk_total_bytes" in metadata
 
 

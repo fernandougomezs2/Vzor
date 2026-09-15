@@ -15,6 +15,7 @@ def test_readme_links_and_documentation_structure_exist() -> None:
         "docs/getting-started.md",
         "docs/concepts.md",
         "docs/professional-workflows.md",
+        "docs/licensing.md",
         "AGENTS.md",
         "LICENSE",
         "CHANGELOG.md",
@@ -25,7 +26,7 @@ def test_readme_links_and_documentation_structure_exist() -> None:
     assert "vzor.export_excel(" not in readme
     assert "vzor.contract(" not in readme
     assert "vzor.analyze_join(" not in readme
-    assert "[MIT License](LICENSE)" in readme
+    assert "[Vzor Community and SaaS\nLicense 1.0](LICENSE)" in readme
     assert 'report.to_html("vzor report.html")' in readme
 
 

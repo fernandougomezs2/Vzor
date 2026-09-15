@@ -259,4 +259,4 @@ def test_public_exports_and_existing_profile_api_remain_available():
     assert vzor.ObservedColumnSchema is not None
     assert vzor.ObservedDatasetSchema is not None
     assert vzor.profile(df).column("id").logical_type == "integer"
-    assert vzor.version() == "0.4.0"
+    assert vzor.version() == "0.4.1"

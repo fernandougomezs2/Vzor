@@ -79,7 +79,7 @@ def test_command_help_is_clear_and_lists_exit_codes(capsys, command: str, expect
 def test_version_has_exact_stdout_and_no_stderr(capsys) -> None:
     assert main(["version"]) == 0
     captured = capsys.readouterr()
-    assert captured.out == "0.4.0\n"
+    assert captured.out == "0.4.1\n"
     assert captured.err == ""
 
 
@@ -366,5 +366,5 @@ def test_module_entry_point_runs_in_a_subprocess() -> None:
     )
 
     assert result.returncode == 0
-    assert result.stdout == "0.4.0\n"
+    assert result.stdout == "0.4.1\n"
     assert result.stderr == ""
