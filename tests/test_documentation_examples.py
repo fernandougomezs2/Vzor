@@ -16,6 +16,8 @@ def test_readme_links_and_documentation_structure_exist() -> None:
         "docs/concepts.md",
         "docs/professional-workflows.md",
         "docs/licensing.md",
+        "docs/publishing.md",
+        "docs/release-checklist.md",
         "AGENTS.md",
         "LICENSE",
         "CHANGELOG.md",
