@@ -232,6 +232,8 @@ Power BI present results.
 - [Getting Started](docs/getting-started.md)
 - [Core Concepts](docs/concepts.md)
 - [Professional Workflows](docs/professional-workflows.md)
+- [Publishing Guide](docs/publishing.md)
+- [Release Checklist](docs/release-checklist.md)
 - [Agent Guide](AGENTS.md)
 - [Changelog](CHANGELOG.md)
 - [v0.4.0 Release Checklist](docs/release-checklist-v0.4.0.md)

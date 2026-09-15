@@ -24,6 +24,12 @@ polars = ["polars>=1.0,<2"]
 [project.scripts]
 vzor = "vzor.cli:main"
 
+[project.urls]
+Repository = "https://github.com/fernandougomezs2/Vzor"
+Documentation = "https://github.com/fernandougomezs2/Vzor#readme"
+Issues = "https://github.com/fernandougomezs2/Vzor/issues"
+Changelog = "https://github.com/fernandougomezs2/Vzor/blob/main/CHANGELOG.md"
+
 [tool.maturin]
 bindings = "pyo3"
 manifest-path = "crates/vzor-core/Cargo.toml"

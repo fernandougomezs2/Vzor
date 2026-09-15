@@ -1,0 +1,158 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-release:
+    name: verify release tag and version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify a release tag matches package metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import tomllib
+          from pathlib import Path
+
+          if os.environ.get("GITHUB_REF_TYPE") != "tag":
+              raise SystemExit("Publication is permitted only from a tag ref.")
+          tag = os.environ["GITHUB_REF_NAME"]
+          package_version = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
+          cargo_version = re.search(
+              r'^version = "([^"]+)"$',
+              Path("crates/vzor-core/Cargo.toml").read_text(),
+              re.MULTILINE,
+          ).group(1)
+          expected_tag = f"v{package_version}"
+          if tag != expected_tag:
+              raise SystemExit(f"Tag {tag!r} does not match package version {package_version!r}.")
+          if cargo_version != package_version:
+              raise SystemExit(
+                  f"Cargo version {cargo_version!r} does not match package version {package_version!r}."
+              )
+          print(f"Verified release {tag} for vzor {package_version}.")
+          PY
+
+  build-wheels:
+    name: wheel (${{ matrix.os }}, CPython ${{ matrix.python }})
+    needs: verify-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - if: runner.os == 'Linux'
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -i python${{ matrix.python }}
+          manylinux: 2_28
+      - if: runner.os == 'Windows'
+        uses: PyO3/maturin-action@v1
+        with:
+          command: build
+          args: --release --out dist -i python
+      - name: Clean-install pandas smoke test
+        shell: bash
+        run: |
+          python -m venv wheel-smoke
+          wheel-smoke/bin/python -m pip install --upgrade pip
+          wheel-smoke/bin/python -m pip install dist/*.whl
+          wheel-smoke/bin/python -c "import pandas as pd, vzor; df = pd.DataFrame({'id': [1, 2]}); assert vzor.__version__ == vzor.version() == '0.4.1'; assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
+        if: runner.os != 'Windows'
+      - name: Clean-install pandas smoke test
+        shell: pwsh
+        run: |
+          python -m venv wheel-smoke
+          $wheel = (Get-ChildItem -LiteralPath dist -Filter '*.whl' | Select-Object -First 1).FullName
+          & wheel-smoke\Scripts\python.exe -m pip install --upgrade pip
+          & wheel-smoke\Scripts\python.exe -m pip install $wheel
+          & wheel-smoke\Scripts\python.exe -c "import pandas as pd, vzor; df = pd.DataFrame({'id': [1, 2]}); assert vzor.__version__ == vzor.version() == '0.4.1'; assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
+        if: runner.os == 'Windows'
+      - name: Clean-install Polars smoke test
+        shell: bash
+        run: |
+          wheel-smoke/bin/python -m pip install "polars>=1.0,<2"
+          wheel-smoke/bin/python -c "import polars as pl, vzor; df = pl.DataFrame({'id': [1, 2]}); assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
+        if: runner.os != 'Windows'
+      - name: Clean-install Polars smoke test
+        shell: pwsh
+        run: |
+          & wheel-smoke\Scripts\python.exe -m pip install "polars>=1.0,<2"
+          & wheel-smoke\Scripts\python.exe -c "import polars as pl, vzor; df = pl.DataFrame({'id': [1, 2]}); assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
+        if: runner.os == 'Windows'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-cp${{ matrix.python }}
+          path: dist/*.whl
+          if-no-files-found: error
+
+  validate-artifacts:
+    name: validate distributions
+    needs: build-wheels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+      - name: Install validation tooling
+        run: python -m pip install --upgrade twine
+      - name: Validate artifact names, metadata, and license
+        run: python scripts/validate_release_artifacts.py dist "$GITHUB_REF_NAME"
+      - name: Validate package metadata and README rendering
+        run: python -m twine check dist/*
+
+  publish:
+    name: publish to PyPI
+    needs: validate-artifacts
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+      - name: Revalidate distributions before publication
+        run: python scripts/validate_release_artifacts.py dist "$GITHUB_REF_NAME"
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
