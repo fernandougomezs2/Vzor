@@ -31,17 +31,30 @@ administrator; the workflow does not change environment protection itself.
 5. Merge the release preparation into `main`, then create and push exactly one
    matching tag, for example `v0.4.2` for package version `0.4.2`.
 
-## How publication works
+## Publish a historical tag
 
-`release.yml` runs for pushed `v*` tags and can also be manually dispatched
-only from a tag. Its first job rejects a branch ref or a tag that differs from
-`v` plus the package version. It builds the four supported wheels, clean-tests
-them with pandas and Polars, validates downloaded artifacts and README metadata
-with Twine, then uses OIDC to publish once from the `pypi` environment.
+For a tag created before `release.yml` existed, run **Publish to PyPI** from
+`main`; do not select the historical tag as the workflow ref. Enter the tag in
+the required `release_tag` input, for example `v0.4.1`. The workflow verifies
+that the remote tag exists, checks out that tag explicitly, validates its
+version and license, and builds all wheels from that tag.
 
-For an already-existing valid tag, merge this workflow into the default branch,
-open Actions → **Publish to PyPI**, choose that tag as the ref, and run the
-workflow. The tag/version guard and the environment approval remain in effect.
+`dry_run` defaults to true. Use it first to validate the checkout, builds,
+artifact metadata, and Twine checks without publishing. A real publication
+requires setting `dry_run` to false and approving the `pypi` environment.
+
+Because the manual run itself is from `main`, configure the GitHub `pypi`
+environment's deployment branches and tags to allow both `main` and `v*`.
+Keep required reviewers enabled. This is the safe option: the manual trigger,
+required `release_tag`, tag/version guard, explicit tag checkout, artifact
+checks, and environment approval prevent an accidental main build.
+
+## Publish a new tag
+
+Future tags that already contain `release.yml` continue to use the normal
+`push` trigger for `v*`. In that mode the workflow resolves the release tag
+from the push event, checks out that tag, and publishes only after the same
+checks and environment approval.
 
 ## After publication
 

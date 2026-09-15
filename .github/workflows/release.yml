@@ -5,46 +5,90 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing release tag to publish, e.g. v0.4.1"
+        required: true
+        type: string
+      dry_run:
+        description: "Validate and build only; do not publish to PyPI"
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
 
 jobs:
   verify-release:
-    name: verify release tag and version
+    name: verify release tag and source
     runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.release.outputs.tag }}
+      package_version: ${{ steps.metadata.outputs.version }}
+      source_sha: ${{ steps.metadata.outputs.source_sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: release
+        name: Resolve and verify release tag
+        shell: bash
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            tag='${{ inputs.release_tag }}'
+          else
+            tag="$GITHUB_REF_NAME"
+          fi
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid release tag: $tag" >&2
+            exit 1
+          fi
+          git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null
+          git rev-parse --verify "$tag^{commit}" > /dev/null
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Verify a release tag matches package metadata
+      - id: metadata
+        name: Verify tag package metadata and license
         shell: bash
         run: |
           python - <<'PY'
           import os
           import re
+          import subprocess
           import tomllib
           from pathlib import Path
 
-          if os.environ.get("GITHUB_REF_TYPE") != "tag":
-              raise SystemExit("Publication is permitted only from a tag ref.")
-          tag = os.environ["GITHUB_REF_NAME"]
-          package_version = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
+          tag = os.environ["RELEASE_TAG"]
+          package_version = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
           cargo_version = re.search(
               r'^version = "([^"]+)"$',
-              Path("crates/vzor-core/Cargo.toml").read_text(),
+              Path("crates/vzor-core/Cargo.toml").read_text(encoding="utf-8"),
               re.MULTILINE,
           ).group(1)
-          expected_tag = f"v{package_version}"
-          if tag != expected_tag:
-              raise SystemExit(f"Tag {tag!r} does not match package version {package_version!r}.")
-          if cargo_version != package_version:
-              raise SystemExit(
-                  f"Cargo version {cargo_version!r} does not match package version {package_version!r}."
+          pyproject_text = Path("pyproject.toml").read_text(encoding="utf-8")
+          license_text = Path("LICENSE").read_text(encoding="utf-8")
+          if tag != f"v{package_version}" or cargo_version != package_version:
+              raise SystemExit("Release tag, pyproject version, and Cargo version must match.")
+          if "MIT" in pyproject_text or "OSI Approved" in pyproject_text:
+              raise SystemExit("Vzor package metadata must not declare MIT or OSI Approved.")
+          if not license_text.startswith("Vzor Community and SaaS License 1.0\n"):
+              raise SystemExit("Release tag does not contain the required Vzor license.")
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              output.write(f"version={package_version}\n")
+              output.write(
+                  f"source_sha={subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}\n"
               )
-          print(f"Verified release {tag} for vzor {package_version}.")
+          print(f"Verified {tag} at package version {package_version}.")
           PY
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
 
   build-wheels:
     name: wheel (${{ matrix.os }}, CPython ${{ matrix.python }})
@@ -57,6 +101,17 @@ jobs:
         python: ["3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify-release.outputs.release_tag }}
+          fetch-depth: 0
+      - name: Confirm build source
+        shell: bash
+        run: test "$(git rev-parse HEAD)" = "${{ needs.verify-release.outputs.source_sha }}"
+        if: runner.os != 'Windows'
+      - name: Confirm build source
+        shell: pwsh
+        run: if ((git rev-parse HEAD) -ne '${{ needs.verify-release.outputs.source_sha }}') { throw 'Build source does not match the verified tag.' }
+        if: runner.os == 'Windows'
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -77,7 +132,7 @@ jobs:
           python -m venv wheel-smoke
           wheel-smoke/bin/python -m pip install --upgrade pip
           wheel-smoke/bin/python -m pip install dist/*.whl
-          wheel-smoke/bin/python -c "import pandas as pd, vzor; df = pd.DataFrame({'id': [1, 2]}); assert vzor.__version__ == vzor.version() == '0.4.1'; assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
+          wheel-smoke/bin/python -c "import pandas as pd, vzor; df = pd.DataFrame({'id': [1, 2]}); assert vzor.__version__ == vzor.version() == '${{ needs.verify-release.outputs.package_version }}'; assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
         if: runner.os != 'Windows'
       - name: Clean-install pandas smoke test
         shell: pwsh
@@ -86,7 +141,7 @@ jobs:
           $wheel = (Get-ChildItem -LiteralPath dist -Filter '*.whl' | Select-Object -First 1).FullName
           & wheel-smoke\Scripts\python.exe -m pip install --upgrade pip
           & wheel-smoke\Scripts\python.exe -m pip install $wheel
-          & wheel-smoke\Scripts\python.exe -c "import pandas as pd, vzor; df = pd.DataFrame({'id': [1, 2]}); assert vzor.__version__ == vzor.version() == '0.4.1'; assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
+          & wheel-smoke\Scripts\python.exe -c "import pandas as pd, vzor; df = pd.DataFrame({'id': [1, 2]}); assert vzor.__version__ == vzor.version() == '${{ needs.verify-release.outputs.package_version }}'; assert vzor.profile(df).row_count == 2; assert vzor.inspect(df).column_count == 1"
         if: runner.os == 'Windows'
       - name: Clean-install Polars smoke test
         shell: bash
@@ -102,13 +157,13 @@ jobs:
         if: runner.os == 'Windows'
       - uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}-cp${{ matrix.python }}
+          name: wheels-${{ needs.verify-release.outputs.release_tag }}-${{ matrix.os }}-cp${{ matrix.python }}
           path: dist/*.whl
           if-no-files-found: error
 
   validate-artifacts:
     name: validate distributions
-    needs: build-wheels
+    needs: [verify-release, build-wheels]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -119,19 +174,19 @@ jobs:
           python-version: "3.12"
       - uses: actions/download-artifact@v4
         with:
-          pattern: wheels-*
+          pattern: wheels-${{ needs.verify-release.outputs.release_tag }}-*
           path: dist
           merge-multiple: true
       - name: Install validation tooling
         run: python -m pip install --upgrade twine
       - name: Validate artifact names, metadata, and license
-        run: python scripts/validate_release_artifacts.py dist "$GITHUB_REF_NAME"
+        run: python scripts/validate_release_artifacts.py dist "${{ needs.verify-release.outputs.release_tag }}"
       - name: Validate package metadata and README rendering
         run: python -m twine check dist/*
 
   publish:
     name: publish to PyPI
-    needs: validate-artifacts
+    needs: [verify-release, validate-artifacts]
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -147,12 +202,16 @@ jobs:
           python-version: "3.12"
       - uses: actions/download-artifact@v4
         with:
-          pattern: wheels-*
+          pattern: wheels-${{ needs.verify-release.outputs.release_tag }}-*
           path: dist
           merge-multiple: true
       - name: Revalidate distributions before publication
-        run: python scripts/validate_release_artifacts.py dist "$GITHUB_REF_NAME"
+        run: python scripts/validate_release_artifacts.py dist "${{ needs.verify-release.outputs.release_tag }}"
+      - name: Dry run complete
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        run: echo "Validated ${{ needs.verify-release.outputs.release_tag }} without publishing."
       - name: Publish package distributions to PyPI
+        if: github.event_name != 'workflow_dispatch' || !inputs.dry_run
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
