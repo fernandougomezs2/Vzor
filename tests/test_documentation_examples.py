@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_readme_links_and_documentation_structure_exist() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    repository = "https://github.com/fernandougomezs2/Vzor/blob/main"
 
     for relative_path in (
         "docs/getting-started.md",
@@ -22,13 +23,15 @@ def test_readme_links_and_documentation_structure_exist() -> None:
         "LICENSE",
         "CHANGELOG.md",
     ):
-        assert f"]({relative_path})" in readme
+        assert f"]({repository}/{relative_path})" in readme
         assert (ROOT / relative_path).is_file()
-    assert "pip install vzor" not in readme
+    assert "python -m pip install vzor" in readme
+    assert 'python -m pip install "vzor[polars]"' in readme
     assert "vzor.export_excel(" not in readme
     assert "vzor.contract(" not in readme
     assert "vzor.analyze_join(" not in readme
-    assert "[Vzor Community and SaaS\nLicense 1.0](LICENSE)" in readme
+    assert f"[MIT License]({repository}/LICENSE)" in readme
+    assert "commercial SaaS" not in readme
     assert 'report.to_html("vzor report.html")' in readme
 
 

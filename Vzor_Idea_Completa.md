@@ -4,7 +4,8 @@
 > backends; no pretende reemplazarlos ni convertirse en un motor general de
 > ingesta.
 
-Estado actual: **Vzor 0.4.0 — Hardening, compatibility and release readiness — COMPLETE**. La subfase
+Estado actual: **Vzor 0.4.2 — MIT License & PyPI Metadata Fix**. Es un release
+de mantenimiento sin cambios de runtime ni API. La subfase
 v0.4.1 cerró la infraestructura de benchmarks locales y el inventario de
 memoria. v0.4.2-A cerró la eliminación de clones internos redundantes de
 `DatasetInput`. v0.4.2-B cerró la reducción de materialización transitoria en
@@ -19,10 +20,9 @@ público ni implican soporte general para datasets de 5M filas. v0.4.5 añadió
 guardrails de benchmark y evidencia progresiva para datos grandes; los límites
 dependen del perfil, backend y hardware, sin afirmar soporte 5M universal. v0.4.6
 formaliza y valida la compatibilidad CPython 3.12/3.13 para Windows y Linux
-x86-64, pandas y Polars opcional, junto con CI y wheels sin publicación
-automática. Los reportes
+x86-64, pandas y Polars opcional, junto con CI y wheels. Los reportes
 mantienen todos sus datos y HTML completo, mientras que su `repr` de alto nivel
-presenta summaries y previews estructurales acotados. El paquete es `0.4.0`.
+presenta summaries y previews estructurales acotados. El paquete es `0.4.2`.
 
 v0.4.7 cerró el hardening final con targets Rust de propiedades de semilla fija,
 regresiones de bordes públicos y documentación de release. No cambió la API,

@@ -9,9 +9,9 @@ Vzor complements pandas and Polars. It does not replace them.
 
 > Detect before correcting. Observe before restricting. Validate before trusting.
 
-Vzor 0.4.1 is a maintenance release for the existing API. It preserves the
-compact structural plain-text reports, complete standalone HTML, analytics,
-and CLI contracts while adopting the Vzor Community and SaaS License 1.0.
+Vzor 0.4.2 is a maintenance-only release. It preserves the Rust core, Python
+API, CLI, supported backends, and output contracts while adopting the standard
+MIT License and correcting the package metadata published on PyPI.
 
 ## Why Vzor
 
@@ -27,11 +27,10 @@ backend is `pandas>=2.2.3,<4`; Polars is optional through
 `pip install "vzor[polars]"` with `polars>=1.0,<2`.
 
 The repository CI exercises the minimum and current supported pandas and
-Polars releases for both Python versions. It builds CPython-version-specific
-wheels for Windows and Linux x86-64, smoke-tests fresh installs, and publishes
-the wheels only as workflow artifacts. This repository does not publish to
-PyPI from CI. The v0.4.0 remote gate passed across the complete matrix; exact
-job, wheel, and artifact evidence is in the release checklist. Python 3.14 is
+Polars releases for both Python versions. The release workflow builds and
+smoke-tests four CPython-version-specific wheels for Windows and Linux x86-64,
+validates their metadata, and publishes only those wheels through PyPI Trusted
+Publishing. It does not build or publish a source distribution. Python 3.14 is
 intentionally outside the tested support matrix.
 
 ## DataFrame backends
@@ -66,21 +65,22 @@ Polars, or SQL for those responsibilities.
 
 ## Installation
 
-Vzor is documented here as a local/source installation; this repository does
-not claim a published PyPI package.
+Install Vzor from PyPI with pandas support:
 
-The local development baseline is Windows with Python 3.12 and a Rust toolchain
-available to build the PyO3 extension. See
-[the compatibility and wheel notes](docs/v0.4.6-compatibility-ci-wheels.md)
-and the [v0.4.0 release checklist](docs/release-checklist-v0.4.0.md) for the
-complete platform matrix and validation status.
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install maturin
-python -m maturin develop --release
+```console
+python -m pip install vzor
 ```
+
+Install the optional Polars backend with:
+
+```console
+python -m pip install "vzor[polars]"
+```
+
+The published distributions are version-specific wheels for CPython 3.12 and
+3.13 on Windows x86-64 and Linux x86-64. Source-development instructions and
+the validated platform matrix are documented in the
+[compatibility and wheel notes](https://github.com/fernandougomezs2/Vzor/blob/main/docs/v0.4.6-compatibility-ci-wheels.md).
 
 ## Quick Start
 
@@ -229,39 +229,40 @@ Power BI present results.
 
 ## Documentation
 
-- [Getting Started](docs/getting-started.md)
-- [Core Concepts](docs/concepts.md)
-- [Professional Workflows](docs/professional-workflows.md)
-- [Publishing Guide](docs/publishing.md)
-- [Release Checklist](docs/release-checklist.md)
-- [Agent Guide](AGENTS.md)
-- [Changelog](CHANGELOG.md)
-- [v0.4.0 Release Checklist](docs/release-checklist-v0.4.0.md)
-- [v0.4.1 Release Notes](docs/release-notes-v0.4.1.md)
+- [Getting Started](https://github.com/fernandougomezs2/Vzor/blob/main/docs/getting-started.md)
+- [Core Concepts](https://github.com/fernandougomezs2/Vzor/blob/main/docs/concepts.md)
+- [Professional Workflows](https://github.com/fernandougomezs2/Vzor/blob/main/docs/professional-workflows.md)
+- [Licensing](https://github.com/fernandougomezs2/Vzor/blob/main/docs/licensing.md)
+- [Publishing Guide](https://github.com/fernandougomezs2/Vzor/blob/main/docs/publishing.md)
+- [Release Checklist](https://github.com/fernandougomezs2/Vzor/blob/main/docs/release-checklist.md)
+- [Agent Guide](https://github.com/fernandougomezs2/Vzor/blob/main/AGENTS.md)
+- [Changelog](https://github.com/fernandougomezs2/Vzor/blob/main/CHANGELOG.md)
 
 ## AI / Agent Usage
 
-AI coding assistants can read [AGENTS.md](AGENTS.md) for a concise description
-of Vzor's public API, architecture, contracts, and development rules.
+AI coding assistants can read
+[AGENTS.md](https://github.com/fernandougomezs2/Vzor/blob/main/AGENTS.md) for a
+concise description of Vzor's public API, architecture, contracts, and
+development rules.
 
 ## Roadmap
 
 The roadmap is directional, not current functionality:
 
 - v0.3 — maturity, reporting, and UX — complete
-- v0.4 — hardening, performance, scalability, and backends
-- v0.5 — Excel / Power BI exports
-- v0.6 — explicit Data Contracts
-- v0.7 — Join Risk Analysis
+- v0.4 — hardening, performance, scalability, and backends — complete
+- v0.5 — Excel / Power BI exports — planned
+- v0.6 — explicit Data Contracts — planned
+- v0.7 — Join Risk Analysis — planned
+
+These entries are future direction, not claims that the planned features are
+available today.
 
 ## License
 
-Vzor is free to use for almost any purpose under the [Vzor Community and SaaS
-License 1.0](LICENSE). A commercial license is required only when Vzor is used
-in a commercial SaaS product that has generated more than USD 5,000 in
-cumulative gross revenue: USD 149/year per SaaS product, with a 30-day grace
-period after crossing the threshold.
-
-This is a source-available license, not an OSI-approved open-source license.
-See [licensing details](docs/licensing.md); this README is a summary and the
-LICENSE is the governing legal text.
+Vzor v0.4.2 and future releases are available under the standard
+[MIT License](https://github.com/fernandougomezs2/Vzor/blob/main/LICENSE).
+Previously published artifacts retain the license text distributed with those
+artifacts; the v0.4.2 change does not rewrite historical tags or releases. See
+the [licensing details](https://github.com/fernandougomezs2/Vzor/blob/main/docs/licensing.md)
+and [third-party notices](https://github.com/fernandougomezs2/Vzor/blob/main/THIRD_PARTY_NOTICES.md).

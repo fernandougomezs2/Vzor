@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.2
+
+### Changed
+
+- Vzor v0.4.2 and future releases use the standard MIT License. Previously
+  published artifacts retain the historical license text distributed with
+  each artifact; no historical tag or release is rewritten.
+- Python package metadata now uses the PEP 639 `MIT` license expression and
+  includes `LICENSE` and third-party notices as declared license files.
+- PyPI-facing documentation now uses working GitHub links, documents wheel
+  installation from PyPI, and exposes Repository, Issues, Documentation, and
+  Changelog project URLs.
+- Release validation now checks the MIT license expression, packaged license,
+  project URLs, and all four supported wheel filenames.
+
+### Unchanged
+
+- This maintenance release makes no Rust core, Python public API, CLI,
+  dependency, backend, compatibility-matrix, `output_version`, or persistence
+  `format_version` change.
+
 ## 0.4.1
 
 ### Changed
@@ -88,8 +109,8 @@
 - Python reporting API and deterministic human-readable summaries.
 - Convenience properties for reports and existing exact column lookup.
 - `AGENTS.md`, user documentation, and a self-contained workflow example.
-- A formal MIT License (the historical license at that release; superseded by
-  the Vzor Community and SaaS License 1.0 in 0.4.0's subsequent legal update).
+- A formal MIT License (the license at that release; temporarily superseded by
+  the Vzor Community and SaaS License 1.0 in v0.4.1 and restored for v0.4.2).
 
 ### Changed
 

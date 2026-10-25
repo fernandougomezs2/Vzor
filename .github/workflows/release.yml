@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Existing release tag to publish, e.g. v0.4.1"
+        description: "Existing release tag to publish, e.g. v0.4.2"
         required: true
         type: string
       dry_run:
@@ -76,10 +76,15 @@ jobs:
           license_text = Path("LICENSE").read_text(encoding="utf-8")
           if tag != f"v{package_version}" or cargo_version != package_version:
               raise SystemExit("Release tag, pyproject version, and Cargo version must match.")
-          if "MIT" in pyproject_text or "OSI Approved" in pyproject_text:
-              raise SystemExit("Vzor package metadata must not declare MIT or OSI Approved.")
-          if not license_text.startswith("Vzor Community and SaaS License 1.0\n"):
-              raise SystemExit("Release tag does not contain the required Vzor license.")
+          project = tomllib.loads(pyproject_text)["project"]
+          if project.get("license") != "MIT" or project.get("license-files") != [
+              "LICENSE",
+              "THIRD_PARTY_NOTICES.md",
+              "THIRD_PARTY_LICENSES/Apache-2.0-with-LLVM-exception.txt",
+          ]:
+              raise SystemExit("Vzor package metadata must declare MIT through PEP 639.")
+          if not license_text.startswith("MIT License\n\nCopyright (c) 2026 Vzor contributors\n"):
+              raise SystemExit("Release tag does not contain the required MIT License.")
           with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
               output.write(f"version={package_version}\n")
               output.write(
