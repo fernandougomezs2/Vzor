@@ -14,6 +14,8 @@ v0.2 — Validación, drift y uso operativo         COMPLETE
 v0.3 — Madurez, reporting y UX avanzada          COMPLETE
 v0.4 — Hardening, performance y backends         COMPLETE
 v0.5 — Excel / Power BI exports                   PLANNED
+v0.6 — Data Contracts explícitos                  PLANNED
+v0.7 — Join Risk Analysis                         PLANNED
 ```
 
 # v0.1 — Core — COMPLETE
@@ -90,13 +92,20 @@ un resumen; las reglas de negocio se mantienen en Rust.
 ## Contratos de versión independientes
 
 ```text
-Package version:             0.4.1
+Package version:             0.4.2
 Persistence format_version:  1
 Agent output_version:         1
 ```
 
 El número de versión del paquete no modifica automáticamente ninguno de los dos
 formatos externos.
+
+## v0.4.2 — Licencia MIT y metadata de PyPI
+
+Release de mantenimiento sin cambios de runtime, API, CLI, dependencias ni
+formatos. Vzor v0.4.2 y releases futuras usan la licencia MIT estándar y
+metadata PEP 639. Los artefactos ya publicados conservan la licencia histórica
+incluida en cada artefacto; no se reescriben tags ni releases anteriores.
 
 ## v0.4.1 — Licencia Vzor Community and SaaS License 1.0
 
@@ -156,7 +165,8 @@ No se modifican runtime, CLI, persistencia ni formatos externos.
 
 **COMPLETE.** Se auditan API, contratos, documentación, determinismo,
 dependencias, empaquetado y casos límite; se incorpora la licencia MIT formal
-(histórica, sustituida posteriormente por Vzor Community and SaaS License 1.0),
+(sustituida temporalmente por Vzor Community and SaaS License 1.0 en v0.4.1 y
+restaurada para v0.4.2),
 se valida un wheel release desde un entorno limpio y se cierra el paquete como
 `0.3.0`. `output_version = 1` y `format_version = 1` permanecen sin cambios.
 

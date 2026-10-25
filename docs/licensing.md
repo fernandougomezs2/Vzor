@@ -1,46 +1,32 @@
 # Licensing Vzor
 
-Vzor uses the **Vzor Community and SaaS License 1.0**. It is a permissive
-source-available license with a commercial SaaS threshold. This page is a
-plain-language explanation only; the [LICENSE](../LICENSE) is the legal text
-that governs.
+Vzor v0.4.2 and future releases are distributed under the standard MIT
+License. The repository's [LICENSE](../LICENSE) file is the governing text for
+the current release.
 
-## Free uses
+The MIT License permits use, copying, modification, distribution,
+sublicensing, and sale, subject to retaining its copyright and permission
+notice. It includes the standard warranty and liability disclaimer.
 
-Vzor is free for personal use, education, research, data science, analytics,
-consulting, nonprofits, organizations, internal business use, internal APIs,
-desktop applications, on-premise applications, and commercial software that is
-not subject to the SaaS threshold.
+## Historical releases
 
-It is also free in a commercial SaaS product while that specific product has
-generated USD 5,000 or less in cumulative gross revenue. The calculation is
-per SaaS product, not per company, and does not include revenue from unrelated
-products, consulting, or business lines.
+Relicensing v0.4.2 does not rewrite Git history or retroactively replace the
+license bundled with an artifact that was already published. Each historical
+source tag and wheel remains governed by the license text included in that
+artifact:
 
-## When a commercial license is required
+- v0.4.1 was published under the Vzor Community and SaaS License 1.0.
+- Earlier releases retain the license files shipped with their corresponding
+  source tags and distribution artifacts.
 
-A commercial license is required only for a commercial hosted or
-network-accessible SaaS product that uses Vzor and exceeds USD 5,000 in
-cumulative gross revenue. The price is USD 149 per year for each SaaS product.
-There is a 30-calendar-day grace period after the product crosses the
-threshold.
+Users should inspect the `LICENSE` file inside the exact historical artifact
+they use. No historical tag or release is moved or replaced by v0.4.2.
 
-For example:
+## Third-party software
 
-- A company using Vzor in internal reporting remains free, regardless of the
-  company's total revenue.
-- A consultant using Vzor for client analysis remains free.
-- A hosted product using Vzor that has earned USD 5,000 remains free.
-- A hosted product using Vzor that earns USD 5,001 needs a USD 149/year
-  commercial license for that product before its 30-day grace period ends.
-- If one company operates two SaaS products, only each product that uses Vzor
-  and exceeds the threshold needs its own license.
-
-Normal updates, features, front-end changes, and infrastructure changes do not
-by themselves make a substantially same product a new SaaS product.
-
-## What the license does not require
-
-Vzor does not add mandatory telemetry, activation servers, license calls, or
-automatic revenue tracking. The software license also does not grant rights to
-the Vzor name, logo, trademarks, or branding.
+The MIT License covers Vzor's own source code. Vzor's dependencies remain
+under their respective licenses; relicensing Vzor does not change those terms.
+The project does not vendor third-party source code, and its dependency
+versions remain recorded in `Cargo.lock` and `pyproject.toml`. Binary wheels
+also include [third-party notices](../THIRD_PARTY_NOTICES.md) for their locked
+Rust dependency graph.

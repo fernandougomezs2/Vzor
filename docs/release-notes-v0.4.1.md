@@ -1,5 +1,8 @@
 # Vzor 0.4.1 Release Notes
 
+> These are historical release notes. The v0.4.1 artifacts retain the license
+> described below; Vzor v0.4.2 and future releases use the standard MIT License.
+
 Vzor 0.4.1 is a maintenance release created to adopt the Vzor Community and
 SaaS License 1.0 after the existing `v0.4.0` tag. It makes no runtime behavior,
 public API, CLI, report, dependency, or installation change.

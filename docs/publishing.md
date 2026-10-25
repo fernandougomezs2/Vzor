@@ -25,19 +25,19 @@ administrator; the workflow does not change environment protection itself.
    `pytest -q`.
 3. Confirm CI and wheel workflows are green for CPython 3.12/3.13 on Windows
    and Linux x86-64.
-4. Inspect wheel metadata: it must carry `License-File: LICENSE`, include the
-   Vzor Community and SaaS License 1.0, and not describe Vzor as MIT or
-   OSI-approved.
+4. Inspect wheel metadata: it must use Core Metadata 2.4, carry
+   `License-Expression: MIT` and `License-File: LICENSE`, include the standard
+   MIT License, and expose all four public project URLs.
 5. Merge the release preparation into `main`, then create and push exactly one
    matching tag, for example `v0.4.2` for package version `0.4.2`.
 
-## Publish a historical tag
+## Validate or publish an existing tag
 
-For a tag created before `release.yml` existed, run **Publish to PyPI** from
-`main`; do not select the historical tag as the workflow ref. Enter the tag in
-the required `release_tag` input, for example `v0.4.1`. The workflow verifies
-that the remote tag exists, checks out that tag explicitly, validates its
-version and license, and builds all wheels from that tag.
+Run **Publish to PyPI** from `main`; do not select the release tag as the
+workflow ref. Enter the immutable tag in the required `release_tag` input, for
+example `v0.4.2`. The workflow verifies that the remote tag exists, checks out
+that tag explicitly, validates its version and license, and builds all wheels
+from that tag. Previously published versions must not be uploaded again.
 
 `dry_run` defaults to true. Use it first to validate the checkout, builds,
 artifact metadata, and Twine checks without publishing. A real publication

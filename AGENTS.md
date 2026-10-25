@@ -7,12 +7,12 @@ deterministic data trust layer to Python analytics.
 
 ## Licensing Status
 
-Vzor uses the Vzor Community and SaaS License 1.0. It is source-available and
-must not be described as MIT, OSI-approved, or open source. Do not modify its
-commercial terms without explicit authorization. Do not add telemetry,
-automatic licensing checks, activation, or revenue tracking. Preserve
-third-party notices and do not assert restrictions that the LICENSE does not
-contain.
+Vzor v0.4.2 and future releases use the standard MIT License. Previously
+published artifacts retain the historical license text shipped with those
+artifacts. Do not modify the license without explicit authorization, rewrite
+historical tags or releases, or assert restrictions that the LICENSE does not
+contain. Preserve required third-party notices. Do not add telemetry,
+automatic licensing checks, activation, or revenue tracking.
 
 Vzor complements pandas and Polars. It does not replace them.
 
